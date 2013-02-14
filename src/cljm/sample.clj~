@@ -1,0 +1,6 @@
+(ns cljm.sample
+  (:require cljm.notation))
+
+(def sample-1 {
+  :instruments {
+    :
