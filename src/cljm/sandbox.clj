@@ -15,7 +15,10 @@
 (def metro (metronome 120))
 
 (defn play [note m]
-  (println note))
+  (let [f (:inst note)
+        p (:params note)]
+    (if (inst? f)
+      (apply f p))))
 
 (defn player
   ([notes] (player notes (metronome 120)))
@@ -32,9 +35,9 @@
          (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
 (def test-notes
-  '({:at 4}
-    {:at 5}
-    {:at 6}
-    {:at 7}
-    {:at 7.5}
-    {:at 8}))
+  (list {:at 4 :inst saw-wave :params [440]}
+        {:at 5 :inst saw-wave :params [220]}
+        {:at 6 :inst saw-wave :params [220]}
+        {:at 7 :inst saw-wave :params [440]}
+        {:at 7.5 :inst saw-wave :params [220]}
+        {:at 8 :inst saw-wave :params [440]}))
