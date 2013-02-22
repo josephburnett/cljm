@@ -1,6 +1,5 @@
 (ns cljm.sandbox
-  (:use overtone.live)
-  (:use overtone.synth.sampled-piano))
+  (:use overtone.live))
 
 ;; We use a saw-wave that we defined in the oscillators tutorial
 (definst saw-wave [freq 440 attack 0.01 sustain 0.4 release 0.1 vol 0.4] 
@@ -13,29 +12,29 @@
      (lf-pulse freq)
      vol))
 
-(defn mouseinst []
-  (demo 60 (bpf 
-             (saw (mouse-y 40 440 EXP)) 
-             (mouse-x 40 5000 EXP) 
-             1)))
+(def metro (metronome 120))
 
-(defn mouseinst2 [note]
-  (demo 8 (bpf
-            (saw (midi->hz note))
-            (mouse-x 50 5000 EXP)
-            (mouse-y 0 1 LIN))))
+(defn play [note m]
+  (println note))
 
-(on-event [:midi :note-on]
-  (fn [e]
-    (let [note (:note e) 
-          vel (/ (:velocity e) 127.0)]
-    ;;(println e)    
-    ;;(saw-wave (midi->hz note)))); 0.01 0.4 0.1 vel)))
-    ;;(sampled-piano note vel)))
-    (mouseinst2 note)))
-  ::keyboard-handler)
+(defn player
+  ([notes] (player notes (metronome 120)))
+  ([notes m]
+   (if (empty? notes)
+     nil ; nothing to do
+     (let [next-note (first notes)
+           pivot (inc (:at next-note))
+           [sched-now sched-later] (split-with #(> pivot (:at %)) notes)]
+       (do
+         ; schedule notes until one beat after the first note
+         (doall (map #(apply-at (m (:at %)) play [% m]) sched-now))
+         ; come back to schedule more when we play the first note
+         (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
-
-
-
-
+(def test-notes
+  '({:at 4}
+    {:at 5}
+    {:at 6}
+    {:at 7}
+    {:at 7.5}
+    {:at 8}))
