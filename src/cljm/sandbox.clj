@@ -14,7 +14,7 @@
 
 (def metro (metronome 120))
 
-(defn play [note m]
+(defn play [note]
   (let [f (:inst note)
         p (:params note)]
     (if (inst? f)
@@ -30,14 +30,19 @@
            [sched-now sched-later] (split-with #(> pivot (:at %)) notes)]
        (do
          ; schedule notes until one beat after the first note
-         (doall (map #(apply-at (m (:at %)) play [% m]) sched-now))
+         (doall (map #(do
+                        (if (contains? % :bpm) (metro-bpm m (:bpm %)))
+                        (apply-at (m (:at %)) play [%])) 
+                     sched-now))
          ; come back to schedule more when we play the first note
          (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
 (def test-notes
-  (list {:at 4 :inst saw-wave :params [440]}
-        {:at 5 :inst saw-wave :params [220]}
-        {:at 6 :inst saw-wave :params [220]}
-        {:at 7 :inst saw-wave :params [440]}
-        {:at 7.5 :inst saw-wave :params [220]}
-        {:at 8 :inst saw-wave :params [440]}))
+  (list {:at 1 :inst saw-wave :params []}
+        {:at 2 :inst saw-wave :params []}
+        {:at 3 :inst saw-wave :params []}
+        {:at 4 :inst saw-wave :params []}
+        {:at 5 :inst saw-wave :bpm 240 :params []}
+        {:at 6 :inst saw-wave :params []}
+        {:at 7 :inst saw-wave :params []}
+        {:at 8 :inst saw-wave :params []}))
