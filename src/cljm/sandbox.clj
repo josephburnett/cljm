@@ -37,6 +37,15 @@
          ; come back to schedule more when we play the first note
          (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
+(defn measure
+  [length inst beats & rest-params]
+  (println rest-params)
+  (for [b beats]
+    {:at b :inst inst :params []}))
+
+(def test-measure
+  (measure 8 saw-wave [1 2 3 4 8 9]))
+
 (def test-notes
   (list {:at 1 :inst saw-wave :params []}
         {:at 2 :inst saw-wave :params []}
@@ -46,3 +55,7 @@
         {:at 6 :inst saw-wave :params []}
         {:at 7 :inst saw-wave :params []}
         {:at 8 :inst saw-wave :params []}))
+
+
+
+
