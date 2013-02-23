@@ -38,13 +38,21 @@
          (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
 (defn measure
-  [length inst beats & rest-params]
+  [inst beats & rest-params]
   (println rest-params)
   (for [b beats]
     {:at b :inst inst :params []}))
 
+(defn measures
+  [length & meas]
+  (flatten
+    (map (fn [m i]
+           (map #(assoc % :at (+ (* i length) (:at %))) m))
+         meas
+         (range))))
+
 (def test-measure
-  (measure 8 saw-wave [1 2 3 4 8 9]))
+  (measure saw-wave [1 2 3 4 5 6 7 8]))
 
 (def test-notes
   (list {:at 1 :inst saw-wave :params []}
