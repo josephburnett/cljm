@@ -37,33 +37,31 @@
          ; come back to schedule more when we play the first note
          (apply-at (m (:at next-note)) player [sched-later m])))))) 
 
-(defn measure
+(defn bar
   [inst beats & rest-params]
-  (println rest-params)
-  (for [b beats]
-    {:at b :inst inst :params []}))
+  (let [notes (for [b beats] {:at b :inst inst :params []})]
+    ; apply parameter seqs to notes
+    (reduce (fn [n p]
+              (if (keyword? (first p))
+                (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
+                     n (cycle (rest p)))
+                (map #(assoc %1 :params (cons %2 (:params %1))) 
+                     n (cycle p))))
+            notes
+            rest-params)))
 
-(defn measures
-  [length & meas]
+(defn phrase
+  [bar-length bars]
   (flatten
     (map (fn [m i]
-           (map #(assoc % :at (+ (* i length) (:at %))) m))
-         meas
+           (map #(assoc % :at (+ (* i bar-length) (:at %))) m))
+         bars
          (range))))
 
 (def test-measure
-  (measure saw-wave [1 2 3 4 5 6 7 8]))
-
-(def test-notes
-  (list {:at 1 :inst saw-wave :params []}
-        {:at 2 :inst saw-wave :params []}
-        {:at 3 :inst saw-wave :params []}
-        {:at 4 :inst saw-wave :params []}
-        {:at 5 :inst saw-wave :bpm 240 :params []}
-        {:at 6 :inst saw-wave :params []}
-        {:at 7 :inst saw-wave :params []}
-        {:at 8 :inst saw-wave :params []}))
-
-
+  (bar "saw-wave"
+       [1 2 3 4 5 6 7 8] 
+       [:sustain 0.1 0.4]
+       [:freq 440 220 440]))
 
 
