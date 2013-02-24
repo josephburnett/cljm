@@ -59,7 +59,7 @@
          (range))))
 
 (def test-measure
-  (bar "saw-wave"
+  (bar saw-wave
        [1 2 3 4 5 6 7 8] 
        [:sustain 0.1 0.4]
        [:freq 440 220 440]))
