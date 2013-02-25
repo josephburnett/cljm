@@ -21,7 +21,7 @@
 (def p
   (bar piano
        [1 2 3 4 5 6 7 8]
-       (notes [:C4 :F4])))
+       (notes [:C4 :D4 :C4 :F4])))
 
 (def k
   (bar kick [1 2 3 4 5 6 7 8]))

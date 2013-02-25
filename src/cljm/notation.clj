@@ -14,22 +14,27 @@
   ([notes m]
    (if (empty? notes)
      nil ; nothing to do
-     (let [next-note (first notes)
-           pivot (inc (:at next-note))
-           [sched-now sched-later] (split-with #(> pivot (:at %)) notes)]
+     (let [curr-beat (m)
+           ; fast-forward to the current beat
+           curr-notes (drop-while #(> curr-beat (:at %)) notes)
+           next-beat (:at (first curr-notes))
+           ; separate notes to be scheduled now and later
+           pivot (inc next-beat)
+           [sched-now sched-later] (split-with #(> pivot (:at %)) curr-notes)]
        (do
          ; schedule notes until one beat after the first note
          (doall (map #(do
+                        ; adjust tempo and schedule the note
                         (if (contains? % :bpm) (metro-bpm m (:bpm %)))
                         (apply-at (m (:at %)) play-note [%])) 
                      sched-now))
          ; come back to schedule more when we play the first note
-         (apply-at (m (:at next-note)) play [sched-later m])))))) 
+         (apply-at (m next-beat) play [sched-later m]))))))
 
 (defn bar
   [inst beats & rest-params]
   (let [notes (for [b beats] {:at b :inst inst :params []})]
-    ; apply parameter seqs to notes
+    ; apply parameter seqs to build complete notes
     (reduce (fn [n p]
               (if (keyword? (first p))
                 (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
