@@ -32,24 +32,37 @@
          (apply-at (m next-beat) play [sched-later m]))))))
 
 (defn bar
-  [inst beats & rest-params]
+  [beat-length inst beats & rest-params]
   (let [notes (for [b beats] {:at b :inst inst :params []})]
     ; apply parameter seqs to build complete notes
-    (reduce (fn [n p]
-              (if (keyword? (first p))
-                (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
-                     n (cycle (rest p)))
-                (map #(assoc %1 :params (cons %2 (:params %1))) 
-                     n (cycle p))))
-            notes
-            rest-params)))
+    (with-meta 
+      (reduce (fn [n p]
+                (if (keyword? (first p))
+                  (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
+                       n (cycle (rest p)))
+                  (map #(assoc %1 :params (cons %2 (:params %1))) 
+                       n (cycle p))))
+              notes
+              rest-params)
+      {:beat-length beat-length})))
+
+(defn- running-index
+  ([coll] (cons 0 (running-index 0 (drop-last coll))))
+  ([index coll]
+    (if (empty? coll)
+      '()
+      (cons (first coll) (add (first coll) (rest coll))))))
 
 (defn phrase
-  [bar-length bars]
-  (flatten
-    (map (fn [m i]
-           (map #(assoc % :at (+ (* i bar-length) (:at %))) m))
-         bars
-         (range))))
+  [bars]
+  (let [beats (map #(:beat-length (meta %)) bars)]
+    (with-meta
+      (flatten
+        (map (fn [b i]
+               (let [beat-length (:beat-length (meta b))]
+                 (map #(assoc % :at (+ i (:at %))) b)))
+             bars
+             (running-index beats)))
+      {:beat-length (reduce + beats)})))
 
 
