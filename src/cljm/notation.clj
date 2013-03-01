@@ -68,4 +68,23 @@
              (running-index beats)))
       {:beat-length (reduce + beats)})))
 
+(defn merge-bars-
+  ([a b] (reverse (merge-bars a b '())))
+  ([a b c]
+   (cond
+     ; done
+     (and (empty? a) (empty? b)) c
+     (empty? a) (concat (reverse b) c)
+     (empty? b) (concat (reverse a) c)
+     ; smallest goes first
+     (< (:at (first a)) (:at (first b)))
+       (merge-bars (rest a) b (cons (first a) c))
+     :else
+       (merge-bars a (rest b) (cons (first b) c)))))
 
+(defn score
+  [bars]
+  (with-meta
+    (reduce merge-bars '() bars)
+    {:beat-length (reduce max (map #(:beat-length (meta %)) bars))}))
+  

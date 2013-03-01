@@ -24,8 +24,8 @@
        (notes [:C4 :D4 :C4 :F4])))
 
 (def k
-  (bar 4 120 kick [1 2 3 4]))
+  (bar 4 120 "kick" [1 2 3 4]))
 
 (def h
-  (bar 8 100 c-hat (range 0.5 8.5 0.5)))
+  (bar 8 120 "c-hat" (range 0.9 4)))
 
