@@ -3,6 +3,8 @@
 
 (defn notes [n] (map note n))
 
+(defrecord Note [at bpm inst params])
+
 (defn play-note [note]
   (let [f (:inst note)
         p (:params note)]
@@ -32,8 +34,8 @@
          (apply-at (m next-beat) play [sched-later m]))))))
 
 (defn bar
-  [beat-length inst beats & rest-params]
-  (let [notes (for [b beats] {:at b :inst inst :params []})]
+  [beat-length bpm inst beats & rest-params]
+  (let [notes (for [b beats] (->Note b bpm inst []))]
     ; apply parameter seqs to build complete notes
     (with-meta 
       (reduce (fn [n p]
@@ -48,10 +50,11 @@
 
 (defn- running-index
   ([coll] (cons 0 (running-index 0 (drop-last coll))))
-  ([index coll]
+  ([last-val coll]
     (if (empty? coll)
       '()
-      (cons (first coll) (add (first coll) (rest coll))))))
+      (let [next-val (+ last-val (first coll))]
+        (cons next-val (running-index next-val (rest coll)))))))
 
 (defn phrase
   [bars]

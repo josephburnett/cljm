@@ -19,13 +19,13 @@
               (* amp env filt)))
 
 (def p
-  (bar piano
+  (bar 8 120 piano
        [1 2 3 4 5 6 7 8]
        (notes [:C4 :D4 :C4 :F4])))
 
 (def k
-  (bar kick [1 2 3 4 5 6 7 8]))
+  (bar 4 120 kick [1 2 3 4]))
 
 (def h
-  (bar c-hat (range 0.5 8 0.5)))
+  (bar 8 100 c-hat (range 0.5 8.5 0.5)))
 
