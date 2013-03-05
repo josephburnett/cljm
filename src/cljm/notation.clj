@@ -3,7 +3,11 @@
 
 (defn notes [n] (map note n))
 
-(defrecord Note [at bpm inst params])
+(defrecord Note [at inst params])
+(defrecord Beat [at bpm])
+
+(defn note? [o] (= cljm.notation.Note (type o)))
+(defn beat? [o] (= cljm.notation.Beat (type o))) 
 
 (defn play-note [note]
   (let [f (:inst note)
@@ -27,25 +31,29 @@
          ; schedule notes until one beat after the first note
          (doall (map #(do
                         ; adjust tempo and schedule the note
-                        (if (contains? % :bpm) (metro-bpm m (:bpm %)))
-                        (apply-at (m (:at %)) play-note [%])) 
+                        (if (beat? %) (metro-bpm m (:bpm %)))
+                        (if (note? %)
+                          (apply-at (m (:at %)) play-note [%])))
                      sched-now))
          ; come back to schedule more when we play the first note
          (apply-at (m next-beat) play [sched-later m]))))))
 
 (defn bar
   [beat-length bpm inst beats & rest-params]
-  (let [notes (for [b beats] (->Note b bpm inst []))]
+  (let [notes (for [b beats] (->Note b inst []))]
     ; apply parameter seqs to build complete notes
-    (with-meta 
-      (reduce (fn [n p]
-                (if (keyword? (first p))
-                  (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
-                       n (cycle (rest p)))
-                  (map #(assoc %1 :params (cons %2 (:params %1))) 
-                       n (cycle p))))
-              notes
-              rest-params)
+    (with-meta
+      (merge-bars
+        (reduce (fn [n p]
+                  (if (keyword? (first p))
+                    (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
+                         n (cycle (rest p)))
+                    (map #(assoc %1 :params (cons %2 (:params %1))) 
+                         n (cycle p))))
+                notes
+                rest-params)
+        ; mix in the beats
+        (map #(->Beat % bpm) (range 1 (inc beat-length))))
       {:beat-length beat-length})))
 
 (defn- running-index
@@ -68,7 +76,7 @@
              (running-index beats)))
       {:beat-length (reduce + beats)})))
 
-(defn merge-bars-
+(defn- merge-bars
   ([a b] (reverse (merge-bars a b '())))
   ([a b c]
    (cond
