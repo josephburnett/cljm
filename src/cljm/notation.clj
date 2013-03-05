@@ -65,16 +65,17 @@
         (cons next-val (running-index next-val (rest coll)))))))
 
 (defn phrase
-  [bars]
-  (let [beats (map #(:beat-length (meta %)) bars)]
-    (with-meta
-      (flatten
-        (map (fn [b i]
-               (let [beat-length (:beat-length (meta b))]
-                 (map #(assoc % :at (+ i (:at %))) b)))
-             bars
-             (running-index beats)))
-      {:beat-length (reduce + beats)})))
+  ([b & bars] (phrase (cons b bars)))
+  ([bars]
+    (let [beats (map #(:beat-length (meta %)) bars)]
+      (with-meta
+        (flatten
+          (map (fn [b i]
+                 (let [beat-length (:beat-length (meta b))]
+                   (map #(assoc % :at (+ i (:at %))) b)))
+               bars
+               (running-index beats)))
+        {:beat-length (reduce + beats)}))))
 
 (defn- merge-bars
   ([a b] (reverse (merge-bars a b '())))
@@ -91,8 +92,9 @@
        (merge-bars a (rest b) (cons (first b) c)))))
 
 (defn score
-  [bars]
-  (with-meta
-    (reduce merge-bars '() bars)
-    {:beat-length (reduce max (map #(:beat-length (meta %)) bars))}))
+  ([b & bars] (score (cons b bars)))
+  ([bars]
+    (with-meta
+      (reduce merge-bars '() bars)
+      {:beat-length (reduce max (map #(:beat-length (meta %)) bars))})))
   
