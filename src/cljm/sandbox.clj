@@ -19,13 +19,23 @@
               (* amp env filt)))
 
 (def p
-  (bar 8 120 piano
+  (bar 8 120 "piano"
        [1 2 3 4 5 6 7 8]
        (notes [:C4 :D4 :C4 :F4])))
 
 (def k
-  (bar 4 120 kick [1 2 3 4]))
+  (bar 4 120 "kick" [1 2 3 4]))
 
 (def h
-  (bar 8 120 c-hat (range 1 9 0.5)))
+  (bar 8 120 "c-hat" (range 1 9 0.5)))
 
+(def t
+  (bar 4 120 "test"
+       [1 2 3 4]
+       [:bang 5 [6 6.5] [7 [7.1 7.2]] 8]))
+
+(def t2
+  (bar 4 120 "test"
+       [1 2]
+       ["a" ["b" "c"]]
+       [:x 1 [2 3]]))

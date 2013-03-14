@@ -18,20 +18,35 @@
      :else
        (merge-bars a (rest b) (cons (first b) c)))))
 
+(defn- expand 
+  [notes]
+  (flatten (map 
+             #(let [[prim-params rest-params] (split-with (complement coll?) (:params %))]
+                (if (empty? rest-params)
+                  (list %) ; base case -- all primitives params
+                  (expand  ; recurse on an expanded collection of notes
+                    (for [p (first rest-params)]
+                      (->Note 
+                        (:at %) 
+                        (:inst %) 
+                        (concat prim-params (list p) (rest rest-params))))))) 
+             notes)))
+
 (defn bar
   [beat-length bpm inst beats & rest-params]
   (let [notes (for [b beats] (->Note b inst []))]
     ; apply parameter seqs to build complete notes
     (with-meta
       (merge-bars
-        (reduce (fn [n p]
-                  (if (keyword? (first p))
-                    (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
-                         n (cycle (rest p)))
-                    (map #(assoc %1 :params (cons %2 (:params %1))) 
-                         n (cycle p))))
-                notes
-                rest-params)
+        (expand ; expand chords into notes
+          (reduce (fn [n p]
+                    (if (keyword? (first p))
+                      (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
+                           n (cycle (rest p)))
+                      (map #(assoc %1 :params (cons %2 (:params %1))) 
+                           n (cycle p))))
+                  notes
+                  rest-params))
         ; mix in the beats
         (map #(->Beat % bpm) (range 1 (inc beat-length))))
       {:beat-length beat-length})))
