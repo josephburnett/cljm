@@ -32,12 +32,16 @@
                         (concat prim-params (list p) (rest rest-params))))))) 
              notes)))
 
+(defn with
+  [params bars]
+  (map #(assoc % :params (concat (:params %) params)) bars))
+
 (defn bar
   [beat-length inst beats & rest-params]
   (let [notes (for [b beats] (->Note b inst []))]
-    ; apply parameter seqs to build complete notes
+    ;; apply parameter seqs to build complete notes
     (with-meta
-      (expand ; expand chords into notes
+      (expand ; chords into notes
         (reduce (fn [n p]
                   (if (keyword? (first p))
                     (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
