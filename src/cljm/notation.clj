@@ -33,22 +33,19 @@
              notes)))
 
 (defn bar
-  [beat-length bpm inst beats & rest-params]
+  [beat-length inst beats & rest-params]
   (let [notes (for [b beats] (->Note b inst []))]
     ; apply parameter seqs to build complete notes
     (with-meta
-      (merge-bars
-        (expand ; expand chords into notes
-          (reduce (fn [n p]
-                    (if (keyword? (first p))
-                      (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
-                           n (cycle (rest p)))
-                      (map #(assoc %1 :params (cons %2 (:params %1))) 
-                           n (cycle p))))
-                  notes
-                  rest-params))
-        ; mix in the beats
-        (map #(->Beat % bpm) (range 1 (inc beat-length))))
+      (expand ; expand chords into notes
+        (reduce (fn [n p]
+                  (if (keyword? (first p))
+                    (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
+                         n (cycle (rest p)))
+                    (map #(assoc %1 :params (cons %2 (:params %1))) 
+                         n (cycle p))))
+                notes
+                rest-params))
       {:beat-length beat-length})))
 
 (defn- running-index
@@ -78,4 +75,7 @@
     (with-meta
       (reduce merge-bars '() bars)
       {:beat-length (reduce max (map #(:beat-length (meta %)) bars))})))
-  
+
+(defn timing
+  [bpm bars]
+  (cons (->Time 1 bpm) bars))

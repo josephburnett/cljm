@@ -24,7 +24,7 @@
          ; schedule notes until one beat after the first note
          (doall (map #(do
                         ; adjust tempo and schedule the note
-                        (if (beat? %) (metro-bpm m (:bpm %)))
+                        (if (time? %) (metro-bpm m (:bpm %)))
                         (if (note? %)
                           (apply-at (m (:at %)) play-note [%])))
                      sched-now))
