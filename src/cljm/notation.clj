@@ -80,6 +80,6 @@
       (reduce merge-bars '() bars)
       {:beat-length (reduce max (map #(:beat-length (meta %)) bars))})))
 
-(defn timing
+(defn at-bpm
   [bpm bars]
   (cons (->Time 1 bpm) bars))
