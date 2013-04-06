@@ -85,3 +85,7 @@
 (defn at-bpm
   [bpm bars]
   (cons (->Time 1 bpm) bars))
+
+(defn rest-for
+  [beat-length]
+  (with-meta '() {:beat-length beat-length}))
