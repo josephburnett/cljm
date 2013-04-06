@@ -34,7 +34,9 @@
 
 (defn with
   [params bars]
-  (map #(assoc % :params (concat (:params %) params)) bars))
+  (with-meta
+    (map #(assoc % :params (concat (:params %) params)) bars)
+    (meta bars)))
 
 (defn bar
   [beat-length inst beats & rest-params]
