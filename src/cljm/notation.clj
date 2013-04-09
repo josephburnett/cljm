@@ -40,7 +40,7 @@
 
 (defn bar
   [beat-length inst beats & rest-params]
-  (let [notes (for [b beats] (->Note b inst []))]
+  (let [notes (for [b beats] (->Note b 0.5 inst []))]
     ;; apply parameter seqs to build complete notes
     (with-meta
       (expand ; chords into notes

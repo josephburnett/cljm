@@ -1,6 +1,6 @@
 (ns cljm.core)
 
-(defrecord Note [at inst params])
+(defrecord Note [at for inst params])
 (defrecord Time [at bpm])
 
 (defn note? [o] (= cljm.core.Note (type o)))

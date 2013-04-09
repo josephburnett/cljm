@@ -2,11 +2,13 @@
   (:use cljm.core)
   (:use overtone.core))
 
-(defn- play-note [note]
+(defn- play-note [note m]
   (let [f (:inst note)
-        p (:params note)]
+        p (:params note)
+        t (+ (:at note) (:for note))]
     (if (inst? f)
-      (apply f p))))
+      (let [n (apply f p)]
+        (apply-at (m t) ctl [n :gate 0])))))
 
 (defn play
   ([notes] (play notes (metronome 120)))
@@ -26,7 +28,7 @@
                         ; adjust tempo and schedule the note
                         (if (time? %) (metro-bpm m (:bpm %)))
                         (if (note? %)
-                          (apply-at (m (:at %)) play-note [%])))
+                          (apply-at (m (:at %)) play-note [% m])))
                      sched-now))
          ; come back to schedule more when we play the first note
          (apply-at (m next-beat) play [sched-later m]))))))
