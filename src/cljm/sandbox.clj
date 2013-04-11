@@ -1,7 +1,8 @@
 (ns cljm.sandbox
   (:use overtone.live)
   (:use cljm.notation)
-  (:use overtone.inst.piano))
+  (:use overtone.inst.piano)
+  (:use overtone.inst.sampled-piano))
 
 (definst kick [freq 120 dur 0.3 width 0.5]
     (let [freq-env (* freq (env-gen (perc 0 (* 0.99 dur))))
@@ -39,7 +40,9 @@
        [:at 1 [:gate 0]]))
 
 (def p3
-  (bar 4 piano
+  (bar 4 sampled-piano
        [1 2 3 4]
        (notes [:c4 :d4])
-       [:at 1 [:gate 0]]))
+       [:at [1 :gate 0] [0.5 :gate 0] [0.5 :gate 0]]))
+
+

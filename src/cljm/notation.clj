@@ -51,12 +51,8 @@
 
 (defn apply-tparams
   [notes tparams]
-  (let [a (first tparams)
-        p (rest tparams)]
-  (map #(let [q (if (coll? %2) %2 (list %2)) ; tparam as a coll
-              r (cons a q)] ; with the relative beat at the front
-          (assoc %1 :tparams (cons r (:tparams %1))))
-        notes (cycle p))))
+  (map #(assoc %1 :tparams (cons %2 (:tparams %1)))
+        notes (cycle tparams)))
 
 (defn bar
   [beat-length inst beats & rest-params]
