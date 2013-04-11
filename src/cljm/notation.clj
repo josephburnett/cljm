@@ -29,7 +29,8 @@
                       (->Note 
                         (:at %) 
                         (:inst %) 
-                        (concat prim-params (list p) (rest rest-params))))))) 
+                        (concat prim-params (list p) (rest rest-params))
+                        (:tparams %)))))) 
              notes)))
 
 (defn with
@@ -38,19 +39,37 @@
     (map #(assoc % :params (concat (:params %) params)) bars)
     (meta bars)))
 
+(defn apply-params
+  [notes params]
+  (if (keyword? (first params))
+    ;; named parameter
+    (map #(assoc %1 :params (cons (first params) (cons %2 (:params %1))))
+         notes (cycle (rest params))))
+    ;; unnamed parameter
+    (map #(assoc %1 :params (cons %2 (:params %1))) 
+         notes (cycle params)))
+
+(defn apply-tparams
+  [notes tparams]
+  (let [a (first tparams)
+        p (rest tparams)]
+  (map #(let [q (if (coll? %2) %2 (list %2)) ; tparam as a coll
+              r (cons a q)] ; with the relative beat at the front
+          (assoc %1 :tparams (cons r (:tparams %1))))
+        notes (cycle p))))
+
 (defn bar
   [beat-length inst beats & rest-params]
-  (let [notes (for [b beats] (->Note b 0.5 inst []))]
+  (let [notes (for [b beats] (->Note b inst [] []))]
     ;; apply parameter seqs to build complete notes
     (with-meta
       (expand ; chords into notes
         (reduce (fn [n p]
-                  (if (keyword? (first p))
-                    (map #(assoc %1 :params (cons (first p) (cons %2 (:params %1))))
-                         n (cycle (rest p)))
-                    (map #(assoc %1 :params (cons %2 (:params %1))) 
-                         n (cycle p))))
-                notes
+                  ;; temporal parameters start with ":at beat"
+                  (if (and (keyword? (first p)) (= :at (first p)))
+                    (apply-tparams n (rest p))
+                    (apply-params n p)))
+                notes ; one per beat
                 rest-params))
       {:beat-length beat-length})))
 

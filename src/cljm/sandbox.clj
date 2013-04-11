@@ -1,5 +1,5 @@
 (ns cljm.sandbox
-  (:use overtone.core)
+  (:use overtone.live)
   (:use cljm.notation)
   (:use overtone.inst.piano))
 
@@ -35,5 +35,11 @@
 (def p2
   (bar 4 piano
        [1 2 3 4]
-       [(chord :c4 :major) (chord :d4 :major)]))
+       [(chord :c4 :major) (chord :d4 :major)]
+       [:at 1 [:gate 0]]))
 
+(def p3
+  (bar 4 piano
+       [1 2 3 4]
+       (notes [:c4 :d4])
+       [:at 1 [:gate 0]]))

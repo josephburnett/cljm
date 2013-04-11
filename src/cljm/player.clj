@@ -3,12 +3,19 @@
   (:use overtone.core))
 
 (defn- play-note [note m]
-  (let [f (:inst note)
-        p (:params note)
-        t (+ (:at note) (:for note))]
-    (if (inst? f)
-      (let [n (apply f p)]
-        (apply-at (m t) ctl [n :gate 0])))))
+  (if (and (note? note) (inst? (:inst note)))
+    (let [i (:inst note)
+          p (:params note)]
+      ;; play instrument i with parameters p
+      (let [n (apply i p)]
+        ;; apply temporal parameters t
+        (doall
+          (for [t (:tparams note)]
+            (let [a (+ (first t) (:at note))
+                  q (rest t)]
+              ;; control instrument note n 
+              ;; with parameters q at beat a
+              (apply-at (m a) ctl (cons n q)))))))))
 
 (defn play
   ([notes] (play notes (metronome 120)))
