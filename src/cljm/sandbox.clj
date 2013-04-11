@@ -45,4 +45,9 @@
        (notes [:c4 :d4])
        [:at [1 :gate 0] [0.5 :gate 0] [0.5 :gate 0]]))
 
+(def p4
+  (bar 1 sampled-piano [1] (notes [:c4])
+       [:at [0.5 :level 10]]
+       [:at [0.5 :level 50]]))
+
 
