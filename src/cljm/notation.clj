@@ -2,7 +2,6 @@
   (:use cljm.core)
   (:use overtone.core))
 
-(defn notes [n] (map note n))
 
 (defn- merge-bars
   ([a b] (reverse (merge-bars a b '())))
@@ -61,7 +60,7 @@
     (with-meta
       (expand ; chords into notes
         (reduce (fn [n p]
-                  ;; temporal parameters start with ":at beat"
+                  ;; temporal parameters start with :at
                   (if (and (keyword? (first p)) (= :at (first p)))
                     (apply-tparams n (rest p))
                     (apply-params n p)))
