@@ -21,7 +21,7 @@
               (* amp env filt)))
 
 (def p
-  (bar 4 "piano"
+  (bar 4 sampled-piano
     [1 2 4]
     (notes :c4 :d4)
-    (sustain 4 :4 :8)))
+    (sustain 4 :4 :2 :4)))
