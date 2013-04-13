@@ -1,6 +1,7 @@
 (ns cljm.sandbox
   (:use overtone.live)
   (:use cljm.notation)
+  (:use cljm.notation.piano)
   (:use overtone.inst.piano)
   (:use overtone.inst.sampled-piano))
 
@@ -20,34 +21,7 @@
               (* amp env filt)))
 
 (def p
-  (with [:decay 0 :release 0.3]
-    (bar 8 piano
-         [1 3 4 5 6]
-         [:sustain 1 1 1 1 2]
-         [(chord :c4 :major)])))
-
-
-(def k
-  (bar 4 kick [1 2 3 4]))
-
-(def h
-  (bar 8 c-hat (range 1 9 0.5)))
-
-(def p2
-  (bar 4 piano
-       [1 2 3 4]
-       [(chord :c4 :major) (chord :d4 :major)]
-       [:at 1 [:gate 0]]))
-
-(def p3
-  (bar 4 sampled-piano
-       [1 2 3 4]
-       (notes [:c4 :d4])
-       [:at [1 :gate 0] [0.5 :gate 0] [0.5 :gate 0]]))
-
-(def p4
-  (bar 1 sampled-piano [1] (notes [:c4])
-       [:at [0.5 :level 10]]
-       [:at [0.5 :level 50]]))
-
-
+  (bar 4 "piano"
+    [1 2 4]
+    (notes :c4 :d4)
+    (sustain 4 :4 :8)))

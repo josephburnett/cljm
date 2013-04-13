@@ -1,7 +1,7 @@
 (ns cljm.notation.piano
   (:use overtone.core))
 
-(defn notes [n] (map note n))
+(defn notes [& n] (map note n))
 
 (def duration
   {:_1 1.0
