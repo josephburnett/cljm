@@ -1,9 +1,10 @@
 (ns cljm.sandbox
   (:use overtone.live)
+  (:use overtone.inst.sampled-piano)
+  (:use overtone.inst.piano)
   (:use cljm.notation)
   (:use cljm.notation.piano)
-  (:use overtone.inst.piano)
-  (:use overtone.inst.sampled-piano))
+  (:use cljm.player))
 
 (definst kick [freq 120 dur 0.3 width 0.5]
     (let [freq-env (* freq (env-gen (perc 0 (* 0.99 dur))))
@@ -20,7 +21,7 @@
                   filt (bpf (+ sqr noise) 9000 0.5)]
               (* amp env filt)))
 
-(def p
+(def tst
   (bar 4 sampled-piano
     [1 2 4]
     (notes :c4 :d4)
