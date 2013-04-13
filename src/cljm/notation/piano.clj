@@ -3,7 +3,7 @@
 
 (defn notes [n] (map note n))
 
-(def times
+(def duration
   {:_1 1.0
    :_2 2.0
    :_3 3.0
@@ -12,11 +12,11 @@
    :4 0.25
    :8 0.125})
  
-(defn sustain [beat-length & t]
+(defn sustain [beat-length & times]
   (cons :at
-    (map #(if (and (keyword? %1) (%1 times))
+    (map #(if (and (keyword? %1) (%1 duration))
             ;; t is a fraction of the bar's beat-length
-            (list (* (%1 times) beat-length) :gate 0)
+            (list (* beat-length (%1 duration)) :gate 0)
             ;; default to one beat
             (list 1 :gate 0))
-          t)))
+          times)))
