@@ -35,7 +35,9 @@
 (defn with
   [params bars]
   (with-meta
-    (map #(assoc % :params (concat (:params %) params)) bars)
+    (if (= :at (first params))
+      (map #(assoc % :tparams (concat (:tparams %) (rest params))) bars)
+      (map #(assoc % :params (concat (:params %) params)) bars))
     (meta bars)))
 
 (defn apply-params

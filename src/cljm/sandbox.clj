@@ -24,5 +24,8 @@
 (def tst
   (bar 4 sampled-piano
     [1 2 4]
-    (notes :c4 :d4)
-    (sustain 4 :4 :2 :4)))
+    (notes :c4 :d4)))
+
+(def tst2
+  (with (sustain 4 :4)
+    (phrase tst tst)))
