@@ -2,109 +2,47 @@
   (:use cljm.core)
   (:use overtone.core))
 
+(defn- sum-time [t]
+  (reduce #(+ %1 (case %2
+                  \- 1/4
+                  \. 1/16
+                  \_ 1/64))
+           0 (filter #(contains? #{ \- \. \_ } %1) t)))
 
-(defn- merge-bars
-  ([a b] (reverse (merge-bars a b '())))
-  ([a b c]
-   (cond
-     ; done
-     (and (empty? a) (empty? b)) c
-     (empty? a) (concat (reverse b) c)
-     (empty? b) (concat (reverse a) c)
-     ; smallest goes first
-     (< (:at (first a)) (:at (first b)))
-       (merge-bars (rest a) b (cons (first a) c))
-     :else
-       (merge-bars a (rest b) (cons (first b) c)))))
+(defn- count-time-in [term]
+  (let [t (take-while #(not (= \| %1)) term)]
+    (sum-time t)))
 
-(defn- expand 
-  [notes]
-  (flatten (map 
-             #(let [[prim-params rest-params] (split-with (complement coll?) (:params %))]
-                (if (empty? rest-params)
-                  (list %) ; base case -- all primitives params
-                  (expand  ; recurse on an expanded collection of notes
-                    (for [p (first rest-params)]
-                      (->Note 
-                        (:at %) 
-                        (:inst %) 
-                        (concat prim-params (list p) (rest rest-params))
-                        (:tparams %)))))) 
-             notes)))
+(defn- count-time-total [term]
+  (sum-time term))
 
-(defn with
-  [params bars]
-  (with-meta
-    (if (= :at (first params))
-      (map #(assoc % :tparams (concat (:tparams %) (rest params))) bars)
-      (map #(assoc % :params (concat (:params %) params)) bars))
-    (meta bars)))
+(defn- term-accidental [term]
+  (reduce #(+ %1 (case %2
+                   \o -1
+                   \+ 1))
+           0 (filter #(contains? #{ \o \+ } %1) term)))
 
-(defn- apply-params
-  [notes params]
-  (if (keyword? (first params))
-    ;; named parameter
-    (map #(assoc %1 :params (cons (first params) (cons %2 (:params %1))))
-         notes (cycle (rest params)))
-    ;; unnamed parameter
-    (map #(assoc %1 :params (cons %2 (:params %1))) 
-         notes (cycle params))))
+(defn- term-note [term]
+  (let [n #{ \A \B \C \D \E \F \G
+             \1 \2 \3 \4 \5 \6 \7 \8 \9 \0}
+        t (filter #(contains? n %1) term)]
+    (+ (note (keyword (apply str t)))
+       (term-accidental term))))
 
-(defn- apply-tparams
-  [notes tparams]
-  (map #(assoc %1 :tparams (cons %2 (:tparams %1)))
-        notes (cycle tparams)))
+(defn term-bar [term]
+  (bar (count-time-in term) nil [1]
+       [:note (term-note term)]
+       [:at [(count-time-total term) :gate 0]]))
+       
+(defmacro line-bars 
+  "Interpret terms as string parameters to term-bar."
+  ([term] `(list (term-bar (str (quote ~term)))))
+  ([term & terms]
+    `(cons (term-bar (str (quote ~term))) (line-bars ~@terms))))
 
-(defn bar
-  [beat-length inst beats & rest-params]
-  (let [notes (for [b beats] (->Note b inst [] []))]
-    ;; apply parameter seqs to build complete notes
-    (with-meta
-      (expand ; chords into notes
-        (reduce (fn [n p]
-                  ;; temporal parameters start with :at
-                  (if (and (keyword? (first p)) (= :at (first p)))
-                    (apply-tparams n (rest p))
-                    (apply-params n p)))
-                notes ; one per beat
-                rest-params))
-      {:beat-length beat-length})))
+(defmacro staff
+  ([line] `(phrase (line-bars ~@line)))
+  ([line & lines]
+    `(score (phrase (line-bars ~@line)) (staff ~@lines))))
 
-(defn- running-index
-  ([coll] (cons 0 (running-index 0 (drop-last coll))))
-  ([last-val coll]
-    (if (empty? coll)
-      '()
-      (let [next-val (+ last-val (first coll))]
-        (cons next-val (running-index next-val (rest coll)))))))
 
-(defn phrase
-  ([b & bars] (phrase (cons b bars)))
-  ([bars]
-    (let [beats (map #(:beat-length (meta %)) bars)]
-      (with-meta
-        (flatten
-          (map (fn [b i]
-                 (let [beat-length (:beat-length (meta b))]
-                   (map #(assoc % :at (+ i (:at %))) b)))
-               bars
-               (running-index beats)))
-        {:beat-length (reduce + beats)}))))
-
-(defn score
-  ([b & bars] (score (cons b bars)))
-  ([bars]
-    (with-meta
-      (reduce merge-bars '() bars)
-      {:beat-length (reduce max (map #(:beat-length (meta %)) bars))})))
-
-(defn at-bpm
-  [bpm bars]
-  (cons (->Time 1 bpm) bars))
-
-(defn rest-for
-  [beat-length]
-  (with-meta '() {:beat-length beat-length}))
-
-(defn tparam [p & times]
-  (cons :at (map #(cons %1 p) times)))
