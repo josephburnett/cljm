@@ -3,7 +3,6 @@
   (:use overtone.inst.sampled-piano)
   (:use overtone.inst.piano)
   (:use cljm.notation)
-  (:use cljm.notation.piano)
   (:use cljm.player))
 
 (definst kick [freq 120 dur 0.3 width 0.5]
@@ -21,11 +20,5 @@
                   filt (bpf (+ sqr noise) 9000 0.5)]
               (* amp env filt)))
 
-(def tst
-  (bar 4 sampled-piano
-    [1 2 4]
-    (notes :c4 :d4)))
 
-(def tst2
-  (with (sustain 4 :4)
-    (phrase tst tst)))
+(def test (staff [ C4-- ]))

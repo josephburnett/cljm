@@ -49,6 +49,12 @@
       (map #(assoc % :params (concat (:params %) params)) bars))
     (meta bars)))
 
+(defn with-inst
+  [inst bars]
+  (with-meta
+    (map #(assoc % :inst inst) bars)
+    (meta bars)))
+
 (defn- apply-params
   [notes params]
   (if (keyword? (first params))

@@ -4,9 +4,9 @@
 
 (defn- sum-time [t]
   (reduce #(+ %1 (case %2
-                  \- 1/4
-                  \. 1/16
-                  \_ 1/64))
+                  \- 1
+                  \. 1/4
+                  \_ 1/16))
            0 (filter #(contains? #{ \- \. \_ } %1) t)))
 
 (defn- count-time-in [term]
