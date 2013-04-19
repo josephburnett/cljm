@@ -37,5 +37,15 @@
        [:note (term-note term)]
        [:at [(count-time-total term) :gate 0]]))
        
+(defmacro line-bars 
+  "Interpret terms as string parameters to term-bar."
+  ([term] `(list (term-bar (str (quote ~term)))))
+  ([term & terms]
+    `(cons (term-bar (str (quote ~term))) (line-bars ~@terms))))
+
+(defmacro staff
+  ([line] `(phrase (line-bars ~@line)))
+  ([line & lines]
+    `(score (phrase (line-bars ~@line)) (staff ~@lines))))
 
 
