@@ -22,17 +22,21 @@
                    \+ 1))
            0 (filter #(contains? #{ \o \+ } %1) term)))
 
-(defn- term-note [term]
+(defn term-note [term]
   (let [n #{ \A \B \C \D \E \F \G
              \1 \2 \3 \4 \5 \6 \7 \8 \9 \0}
         t (filter #(contains? n %1) term)]
-    (+ (note (keyword (apply str t)))
-       (term-accidental term))))
+    (if (empty? t)
+      nil ; rest
+      (+ (note (keyword (apply str t)))
+         (term-accidental term)))))
 
 (defn term-bar [term]
-  (bar (count-time-in term) nil [1]
-       [:note (term-note term)]
-       [:at [(count-time-total term) :gate 0]]))
+  (let [n (term-note term)]
+    (if (nil? n)
+      (bar (count-time-in term) nil []) ; rest
+      (bar (count-time-in term) nil [1] [:note n]
+           [:at [(count-time-total term) :gate 0]]))))
        
 (defmacro line-bars 
   "Interpret terms as string parameters to term-bar."
