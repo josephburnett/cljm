@@ -40,17 +40,17 @@
       (map #(assoc % :params (concat (:params %) params)) bars))
     (meta bars)))
 
-(defn apply-params
+(defn- apply-params
   [notes params]
   (if (keyword? (first params))
     ;; named parameter
     (map #(assoc %1 :params (cons (first params) (cons %2 (:params %1))))
-         notes (cycle (rest params))))
+         notes (cycle (rest params)))
     ;; unnamed parameter
     (map #(assoc %1 :params (cons %2 (:params %1))) 
-         notes (cycle params)))
+         notes (cycle params))))
 
-(defn apply-tparams
+(defn- apply-tparams
   [notes tparams]
   (map #(assoc %1 :tparams (cons %2 (:tparams %1)))
         notes (cycle tparams)))
@@ -105,3 +105,6 @@
 (defn rest-for
   [beat-length]
   (with-meta '() {:beat-length beat-length}))
+
+(defn tparam [p & times]
+  (cons :at (map #(cons %1 p) times)))
