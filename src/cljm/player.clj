@@ -40,4 +40,6 @@
          ; come back to schedule more when we play the first note
          (apply-at (m next-beat) play [sched-later m]))))))
 
-
+(defn play-with
+  [inst notes]
+  (play (with-inst inst notes)))

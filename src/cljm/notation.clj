@@ -2,12 +2,14 @@
   (:use cljm.core)
   (:use overtone.core))
 
+(def sheet phrase)
+
 (defn- sum-time [t]
   (reduce #(+ %1 (case %2
-                  \- 1
+                  \- 1/2
                   \. 1/4
-                  \_ 1/16))
-           0 (filter #(contains? #{ \- \. \_ } %1) t)))
+                  \_ 1/8))
+           0.0 (filter #(contains? #{ \- \. \_ } %1) t)))
 
 (defn- count-time-in [term]
   (let [t (take-while #(not (= \| %1)) term)]
@@ -22,7 +24,7 @@
                    \+ 1))
            0 (filter #(contains? #{ \o \+ } %1) term)))
 
-(defn term-note [term]
+(defn- term-note [term]
   (let [n #{ \A \B \C \D \E \F \G
              \1 \2 \3 \4 \5 \6 \7 \8 \9 \0}
         t (filter #(contains? n %1) term)]
