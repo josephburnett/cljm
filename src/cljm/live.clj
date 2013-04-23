@@ -13,25 +13,23 @@
       (map #(assoc %1 :at (+ index (:at %))) bars)
       (lazy-loop bars (+ index (:beat-length (meta bars)))))))
 
-(defn on-of
-  [on of bars]
-  (let [curr-beat (CLJM-LIVE-METRO)
-        last-zero (- curr-beat (mod curr-beat of))
-        first-at (+ on of last-zero)]
-    (with-meta
-      (map #(assoc %1 :at (+ first-at (:at %))) bars)
-      (meta bars))))
-
 (defn update
-  [bars]
-  (let [curr-beat (CLJM-LIVE-METRO)]
-    (with-meta
-      (map #(assoc % :at (+ curr-beat (:at %))) bars)
-      (meta bars))))
+  ([bars] (update bars 1 1)) ; play now
+  ([bars on of]
+    (let [curr-beat (CLJM-LIVE-METRO)
+          last-zero (- curr-beat (mod curr-beat of))
+          first-at (+ on (- of 1) last-zero)]
+      (with-meta
+        (map #(assoc % :at (+ first-at (:at %))) bars)
+        (meta bars)))))
 
-(defn live-play [bars]
+(defn play-on
+  [on of bars]
+  (play (update bars on of) CLJM-LIVE-METRO))
+
+(defn play-now [bars]
   (play (update bars) CLJM-LIVE-METRO))
 
 (def ll lazy-loop)
-(def oo on-of)
-(def lp live-play)
+(def po play-on)
+(def pn play-now)
