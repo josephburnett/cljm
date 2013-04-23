@@ -13,8 +13,8 @@
       (map #(assoc %1 :at (+ index (:at %))) bars)
       (lazy-loop bars (+ index (:beat-length (meta bars)))))))
 
-(defn update
-  ([bars] (update bars 1 1)) ; play now
+(defn align
+  ([bars] (align bars 1 1)) ; play now
   ([bars on of]
     (let [curr-beat (CLJM-LIVE-METRO)
           last-zero (- curr-beat (mod curr-beat of))
@@ -25,10 +25,10 @@
 
 (defn play-on
   [on of bars]
-  (play (update bars on of) CLJM-LIVE-METRO))
+  (play (align bars on of) CLJM-LIVE-METRO))
 
 (defn play-now [bars]
-  (play (update bars) CLJM-LIVE-METRO))
+  (play (align bars) CLJM-LIVE-METRO))
 
 (def ll lazy-loop)
 (def po play-on)
