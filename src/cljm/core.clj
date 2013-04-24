@@ -1,8 +1,6 @@
 (ns cljm.core
   (:use [clojure.string :only [join split]]))
 
-(def CLJM-NOTE-FILTERS (atom {:default []}))
-
 (defrecord Note [at inst params tparams])
 (defrecord Time [at bpm])
 

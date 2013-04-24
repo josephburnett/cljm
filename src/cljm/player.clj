@@ -2,6 +2,8 @@
   (:use cljm.core)
   (:use overtone.core))
 
+(def CLJM-NOTE-FILTERS (atom {:default []}))
+
 (defn- apply-note-filters [note]
   (let [h (if (nil? (:handle (meta note))) :default (:handle (meta note)))
         n (reduce #(if (note? %1) (%2 %1)) note (h @CLJM-NOTE-FILTERS))]
