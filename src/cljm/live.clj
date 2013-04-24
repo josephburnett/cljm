@@ -9,12 +9,14 @@
   "Returns an infinite sequence of bars."
   ([bars] (lazy-loop bars 0))
   ([bars index]
-    (lazy-cat
-      (map #(assoc %1 :at (+ index (:at %))) bars)
-      (lazy-loop bars (+ index (:beat-length (meta bars)))))))
+    (with-meta
+      (lazy-cat
+        (map #(assoc %1 :at (+ index (:at %))) bars)
+        (lazy-loop bars (+ index (:beat-length (meta bars)))))
+      (meta bars))))
 
 (defn align
-  ([bars] (align bars 1 1)) ; play now
+  ([bars] (align bars 1 1)) ; on 1 of 1 is the next beat
   ([bars on of]
     (let [curr-beat (CLJM-LIVE-METRO)
           last-zero (- curr-beat (mod curr-beat of))
@@ -33,3 +35,4 @@
 (def ll lazy-loop)
 (def po play-on)
 (def pn play-now)
+
