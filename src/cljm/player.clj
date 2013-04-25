@@ -10,7 +10,8 @@
       (let [;; apply note filters
             n (reduce #(if (note? %1) (%2 %1)) note (:filters channel))]
         (if (and (note? n) (inst? (:inst n)) ; we have a playable result
-                 (false? (:mute channel)))   ; and our channel is not muted
+                 (false? (:mute channel))    ; and our channel is not muted
+                 (false? (:kill channel)))   ; or killed
           ;; play instrument i with parameters p
           (let [i (:inst n)
                 p (:params n)
