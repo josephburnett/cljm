@@ -3,7 +3,9 @@
   (:use overtone.inst.sampled-piano)
   (:use overtone.inst.piano)
   (:use cljm.notation)
-  (:use cljm.player))
+  (:use cljm.player)
+  (:use cljm.core)
+  (:use cljm.live))
 
 (definst kick [freq 120 dur 0.3 width 0.5]
     (let [freq-env (* freq (env-gen (perc 0 (* 0.99 dur))))
@@ -21,4 +23,7 @@
               (* amp env filt)))
 
 
-(def test (staff [ C4-- ]))
+(def rhythm
+  (score
+    (bar 2 kick [1 2])
+    (with-inst sampled-piano (staff [ C4- D4- C4- E4- ]))))

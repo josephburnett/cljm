@@ -35,5 +35,5 @@
     (play (align bars on of) CLJM-LIVE-METRO handle)))
 
 (def ll lazy-loop)
-(def pp play-on)
+(def po play-on)
 
