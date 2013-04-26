@@ -5,8 +5,14 @@
 (defn- update-channel [update-fn channel]
   (swap! CLJM-CHANNELS
          #(let [c-params (channel %)]
-            (if (nil? c-params) @CLJM-CHANNELS ; do nothing
+            (if (nil? c-params) 
+                ;; create new channel
+                (assoc % channel (update-fn {:filters [] :clear false :mute false}))
+                ;; existing channel
                 (assoc % channel (update-fn c-params))))))
+
+(defn create-channel [channel]
+  (update-channel (fn [c] c) channel))
 
 (defn- update-filters [update-fn channel]
   (update-channel #(assoc % :filters (update-fn (:filters %)))

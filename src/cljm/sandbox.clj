@@ -24,9 +24,9 @@
               (* amp env filt)))
 
 
-(def rhythm (staff [ C4- D4- C4- E4- ]))
+;(def rhythm (staff [ C4- D4- C4- E4- ]))
 
-(def f1 (f-inst sampled-piano))
-(def f2 (f-param :level 0.3))
+;(def f1 (f-inst sampled-piano))
+;(def f2 (f-param :level 0.3))
 
 
