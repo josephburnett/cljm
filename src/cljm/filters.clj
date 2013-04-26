@@ -23,3 +23,27 @@
   (update-filters handle (fn [f] [])))
 
 
+;;; Note filters
+
+(defn f-update-instrument [inst]
+  (fn [note]
+    (assoc note :inst inst)))
+
+(defn- update-coll [coll param value]
+  (let [[before after] (split-with #(not (= param %)) coll)]
+    (if (empty? after) ; param is not present
+      ;; append
+      (concat coll (list param value))
+      ;; replace
+      (concat before (list param value) (drop 2 after)))))
+
+(defn f-param [param value]
+  (fn [note]
+    (assoc note :params
+           (update-coll (:params note) param value))))
+
+(defn f-tparam [param value]
+  (fn [note]
+    (assoc note :tparams
+           (map #(update-coll % param value) (:tparams note)))))
+
