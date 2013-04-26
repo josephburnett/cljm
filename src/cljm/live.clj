@@ -37,3 +37,11 @@
 (def ll lazy-loop)
 (def po play-on)
 
+(defn play-in [channel]
+  (midi-poly-player (fn [_ note _ amp _ vel]
+                       (play-note (->Note (CLJM-LIVE-METRO) nil (list :note note :level amp) [])
+                                  CLJM-LIVE-METRO
+                                  channel))))
+
+
+

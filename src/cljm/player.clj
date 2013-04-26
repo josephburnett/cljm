@@ -4,7 +4,7 @@
 
 (def CLJM-CHANNELS (atom {:default {:filters [] :clear false :mute false}}))
 
-(defn- play-note [note m c]
+(defn play-note [note m c]
   (let [channel (c @CLJM-CHANNELS)]
     (if (nil? channel) nil ; do nothing
       (let [;; apply note filters
@@ -23,7 +23,8 @@
                        q (rest t)]
                    ;; control instrument note n 
                    ;; with parameters q at beat a
-                   (apply-at (m a) ctl (cons node q)))))))))))
+                   (apply-at (m a) ctl (cons node q)))))
+            node)))))) ; return the synth node
 
 (defn play
   ([notes] (play notes (metronome 120)))
@@ -50,6 +51,3 @@
             ; come back to schedule more when we play the first note
             (apply-at (m next-beat) play [sched-later m c])))))))
 
-(defn play-with
-  [inst notes]
-  (play (with-inst inst notes)))
