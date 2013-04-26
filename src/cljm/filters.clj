@@ -41,6 +41,16 @@
   ([bool channel]
     (update-channel #(assoc % :mute bool) channel)))
 
+(defn list-channels []
+  (let [channels @CLJM-CHANNELS]
+    (dorun (map (fn [k]
+                  (let [c (k channels)
+                        f (count (:filters c))]
+                    (println k
+                             (if (true? (:clear c)) ":clear" "")
+                             (if (true? (:mute c)) ":mute" "")
+                             (if (> f 0) (str ":filters " f) ""))))
+                (keys channels)))))
 
 ;;; Note filters
 
