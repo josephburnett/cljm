@@ -2,7 +2,7 @@
   (:use cljm.core)
   (:use overtone.core))
 
-(def CLJM-CHANNELS (atom {:default {:filters [] :kill false :mute false}}))
+(def CLJM-CHANNELS (atom {:default {:filters [] :clear false :mute false}}))
 
 (defn- play-note [note m c]
   (let [channel (c @CLJM-CHANNELS)]
@@ -11,7 +11,7 @@
             n (reduce #(if (note? %1) (%2 %1)) note (:filters channel))]
         (if (and (note? n) (inst? (:inst n)) ; we have a playable result
                  (false? (:mute channel))    ; and our channel is not muted
-                 (false? (:kill channel)))   ; or killed
+                 (false? (:clear channel)))  ; or cleared
           ;; play instrument i with parameters p
           (let [i (:inst n)
                 p (:params n)
@@ -30,7 +30,7 @@
   ([notes m] (play notes m :default))
   ([notes m c]
     (let [channel (c @CLJM-CHANNELS)]
-      (if (or (nil? channel) (= true (:kill channel)) (empty? notes))
+      (if (or (nil? channel) (= true (:clear channel)) (empty? notes))
         nil ; nothing to do
         (let [curr-beat (m)
               ; fast-forward to the current beat

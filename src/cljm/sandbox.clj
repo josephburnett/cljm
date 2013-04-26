@@ -5,7 +5,8 @@
   (:use cljm.notation)
   (:use cljm.player)
   (:use cljm.core)
-  (:use cljm.live))
+  (:use cljm.live)
+  (:use cljm.filters))
 
 (definst kick [freq 120 dur 0.3 width 0.5]
     (let [freq-env (* freq (env-gen (perc 0 (* 0.99 dur))))
@@ -23,7 +24,9 @@
               (* amp env filt)))
 
 
-(def rhythm
-  (score
-    (bar 2 kick [1 2])
-    (with-inst sampled-piano (staff [ C4- D4- C4- E4- ]))))
+(def rhythm (staff [ C4- D4- C4- E4- ]))
+
+(def f1 (f-inst sampled-piano))
+(def f2 (f-param :level 0.3))
+
+

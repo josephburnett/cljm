@@ -2,30 +2,49 @@
   (:use cljm.core)
   (:use cljm.player))
 
-(defn update-filters [handle update-fn]
+(defn- update-channel [update-fn channel]
   (swap! CLJM-CHANNELS
-         #(let [h-params (handle %)]
-            (if (nil? h-params) @CLJM-CHANNELS ; do nothing
-                (let [f-coll (update-fn (:filters h-params))
-                      new-h-params (assoc h-params :filters f-coll)]
-                  (assoc % handle new-h-params))))))
+         #(let [c-params (channel %)]
+            (if (nil? c-params) @CLJM-CHANNELS ; do nothing
+                (assoc % channel (update-fn c-params))))))
 
-(defn add-filter [handle f]
-  (update-filters handle 
-                  #(cons f %)))
+(defn- update-filters [update-fn channel]
+  (update-channel #(assoc % :filters (update-fn (:filters %)))
+                  channel))
 
-(defn remove-filter [handle f]
-  (update-filters handle 
-                  (fn [filters] 
-                    (filter #(not (= f %)) filters))))
+(defn add-filter 
+  ([f] (add-filter f :default))
+  ([f channel]
+    (update-filters #(cons f %)
+                    channel)))
 
-(defn clear-filters [handle]
-  (update-filters handle (fn [f] [])))
+(defn remove-filter 
+  ([f] (add-filter f :default))
+  ([f channel]
+    (update-filters (fn [filters] (filter #(not (= f %)) filters))
+                    channel)))
+
+(defn clear-filters
+  ([] (clear-filters :default))
+  ([channel]
+    (update-filters (fn [f] []) channel)))
+
+(defn clear
+  ([] (clear :default))
+  ([channel] (clear true channel))
+  ([bool channel]
+    (update-channel #(assoc % :clear bool) channel)))
+
+(defn mute
+  ([] (mute :default))
+  ([channel] (mute true channel))
+  ([bool channel]
+    (update-channel #(assoc % :mute bool) channel)))
 
 
 ;;; Note filters
 
-(defn f-update-instrument [inst]
+(defn f-inst [inst]
   (fn [note]
     (assoc note :inst inst)))
 
