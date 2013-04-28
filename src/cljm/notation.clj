@@ -51,4 +51,3 @@
   ([line & lines]
     `(score (phrase (line-bars ~@line)) (staff ~@lines))))
 
-

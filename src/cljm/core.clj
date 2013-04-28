@@ -96,15 +96,19 @@
 (defn phrase
   ([b & bars] (phrase (cons b bars)))
   ([bars]
-    (let [beats (map #(:beat-length (meta %)) bars)]
-      (with-meta
-        (flatten
-          (map (fn [b i]
-                 (let [beat-length (:beat-length (meta b))]
-                   (map #(assoc % :at (+ i (:at %))) b)))
-               bars
-               (running-index beats)))
-        {:beat-length (reduce + beats)}))))
+    (if (or (nil? (meta bars)) (nil? (:beat-length (meta bars))))
+      ;; bars is a collection of phrases
+      (let [beats (map #(:beat-length (meta %)) bars)]
+        (with-meta
+          (flatten
+            (map (fn [b i]
+                   (let [beat-length (:beat-length (meta b))]
+                     (map #(assoc % :at (+ i (:at %))) b)))
+                 bars
+                 (running-index beats)))
+          {:beat-length (reduce + beats)}))
+      ;; bars is already a single phrase
+      bars)))
 
 (defn score
   ([b & bars] (score (cons b bars)))

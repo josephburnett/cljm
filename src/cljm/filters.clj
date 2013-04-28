@@ -64,21 +64,38 @@
   (fn [note]
     (assoc note :inst inst)))
 
-(defn- update-coll [coll param value]
+(defn update-coll [coll param update-fn]
   (let [[before after] (split-with #(not (= param %)) coll)]
     (if (empty? after) ; param is not present
       ;; append
-      (concat coll (list param value))
+      (concat coll (list param (update-fn nil)))
       ;; replace
-      (concat before (list param value) (drop 2 after)))))
+      (concat before (list param (update-fn (second after))) (drop 2 after)))))
 
 (defn f-param [param value]
   (fn [note]
     (assoc note :params
-           (update-coll (:params note) param value))))
+           (update-coll (:params note) param (fn [p] param)))))
 
 (defn f-tparam [param value]
   (fn [note]
-    (assoc note :tparams
-           (map #(update-coll % param value) (:tparams note)))))
+    (let [update-fn (fn [p] value)]
+      (assoc note :tparams
+             (map #(update-coll % param update-fn) (:tparams note))))))
 
+(defn f-shift [offset]
+  (fn [note]
+    (assoc note :params
+           (update-coll (:params note) :note (fn [p] (+ offset p))))))
+
+
+;;; Helpers
+
+(defn apply-filter [f bars]
+  (with-meta (map f bars) (meta bars)))
+
+(defn up [offset bars]
+  (apply-filter (f-shift offset) bars))
+
+(defn down [offset bars]
+  (apply-filter (f-shift (* -1 offset)) bars))
