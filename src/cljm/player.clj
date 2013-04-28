@@ -4,7 +4,7 @@
 
 (def CLJM-CHANNELS (atom {:default {:filters [] :clear false :mute false}}))
 
-(def CLJM-LIVE-METRO (metronome 120))
+(def CLJM-METRO (metronome 120))
 
 (defn play-note [note m c]
   (let [channel (c @CLJM-CHANNELS)]
@@ -28,12 +28,11 @@
                    (apply-at (m a) ctl (cons node q)))))
             node)))))) ; return the synth node
 
-(defn play
-  ([notes] (play notes (metronome 120)))
-  ([notes m] (play notes m :default))
-  ([notes m c]
-    (let [channel (c @CLJM-CHANNELS)]
-      (if (or (nil? channel) (= true (:clear channel)) (empty? notes))
+(defn- player
+  [notes c]
+  (let [channel (c @CLJM-CHANNELS)
+        m CLJM-METRO]
+    (if (or (nil? channel) (= true (:clear channel)) (empty? notes))
         nil ; nothing to do
         (let [curr-beat (m)
               ; fast-forward to the current beat
@@ -51,7 +50,7 @@
                              (apply-at (m (:at %)) play-note [% m c])))
                         sched-now))
             ; come back to schedule more when we play the first note
-            (apply-at (m next-beat) play [sched-later m c])))))))
+            (apply-at (m next-beat) player [sched-later c]))))))
 
 (defn lazy-loop
   "Returns an infinite sequence of bars."
@@ -64,34 +63,33 @@
 (defn align
   ([bars] (align bars 1 1)) ; on 1 of 1 is the next beat
   ([bars on of]
-    (let [curr-beat (CLJM-LIVE-METRO)
+    (let [curr-beat (CLJM-METRO)
           last-zero (- curr-beat (mod curr-beat of))
           first-at (+ on (- of 1) last-zero)]
       (with-meta
         (map #(assoc % :at (+ first-at (:at %))) bars)
         (meta bars)))))
 
-(defn play-on
+(defn play
   ;; play now
-  ([bars] (play-on 1 1 bars))
-  ([bars handle] (play-on 1 1 bars handle))
+  ([bars] (play 1 1 bars))
+  ([bars handle] (play 1 1 bars handle))
   ;; play on a specific beat
   ([on of bars]
-    ;; let play use the :default handle
-    (play (align bars on of) CLJM-LIVE-METRO))
+    (player (align bars on of) :default))
   ([on of bars handle]
-    (play (align bars on of) CLJM-LIVE-METRO handle)))
+    (player (align bars on of) handle)))
 
-(def ll lazy-loop)
-(def po play-on)
+(def l lazy-loop)
+(def p play)
 
 (defn play-in
   ([] (play-in :default))
   ([channel]
     (midi-poly-player 
       (fn [_ note _ amp _ vel]
-        (play-note (->Note (CLJM-LIVE-METRO) nil (list :note note :level amp) [])
-                   CLJM-LIVE-METRO
+        (play-note (->Note (CLJM-METRO) nil (list :note note :level amp) [])
+                   CLJM-METRO
                    channel)))))
 
 
