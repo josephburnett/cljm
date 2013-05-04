@@ -6,7 +6,6 @@
   (:use overtone.inst.sampled-piano))
 
 (def base (staff [ C2-- C3- . G2. +A2-- C3- - ]))
-
 (def blues-change
   (with-inst sampled-piano
     (phrase

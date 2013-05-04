@@ -33,12 +33,27 @@
       (+ (note (keyword (apply str t)))
          (term-accidental term)))))
 
-(defn term-bar [term]
-  (let [n (term-note term)]
-    (if (nil? n)
-      (bar (count-time-in term) nil []) ; rest
-      (bar (count-time-in term) nil [1] [:note n]
-           [:at [(count-time-total term) :gate 0]]))))
+(defn- beat-only? [term]
+  (if (empty? (filter #(= \O %1) term)) false true))
+
+(defn- duration-only? [term]
+  (if (empty? (filter #(= \X %1) term)) false true))
+
+(defn- term-bar [term]
+  (let [t (count-time-in term)]
+    (if (beat-only? term)
+      ;; Term is only a beat
+      (bar t nil [1])
+      (if (duration-only? term)
+        ;; Term is beat and duration, but no tone
+        (bar t nil [1] [:at [(count-time-total term) :gate 0]]) 
+        (let [n (term-note term)]
+          (if (nil? n)
+            ;; Rest
+            (bar (count-time-in term) nil []) ; rest
+            ;; Tone and duration
+            (bar (count-time-in term) nil [1] [:note n]
+                 [:at [(count-time-total term) :gate 0]])))))))
        
 (defmacro line-bars 
   "Interpret terms as string parameters to term-bar."
