@@ -62,7 +62,9 @@
 
 (defn f-inst [inst]
   (fn [note]
-    (assoc note :inst inst)))
+    (if (nil? (:inst note))
+      (assoc note :inst inst)
+      note)))
 
 (defn update-coll [coll param update-fn]
   (let [[before after] (split-with #(not (= param %)) coll)]
