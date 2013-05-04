@@ -8,7 +8,8 @@
   (reduce #(+ %1 (case %2
                   \- 1/2
                   \. 1/4
-                  \_ 1/8))
+                  \_ 1/8
+                  \* 1/16))
            0.0 (filter #(contains? #{ \- \. \_ } %1) t)))
 
 (defn- count-time-in [term]
@@ -39,7 +40,7 @@
 (defn- duration-only? [term]
   (if (empty? (filter #(= \X %1) term)) false true))
 
-(defn- term-bar [term]
+(defn term-bar [term]
   (let [t (count-time-in term)]
     (if (beat-only? term)
       ;; Term is only a beat
