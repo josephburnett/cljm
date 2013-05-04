@@ -47,7 +47,7 @@
   ([bool channel]
     (update-channel #(assoc % :mute bool) channel)))
 
-(defn list-channels []
+(defn show-channels []
   (let [channels @CLJM-CHANNELS]
     (dorun (map (fn [k]
                   (let [c (k channels)
