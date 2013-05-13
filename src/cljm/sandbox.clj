@@ -23,12 +23,14 @@
 (add-filter (f-inst subby) :subby)
 
 ;; Adapted from overtone.examples.synthesis.fm
-(definst fminst [note 40 divisor 2.0 depth 1.0 out-bus 0 gate 1 attack 1 sustain 1 release 1]
+(definst fminst [note 40 divisor 2.0 depth 1.0 out-bus 0 gate 1 attack 1 decay 1 sustain 1 release 1 level 1 curve -4]
   (let [carrier (midicps note)
         modulator (/ carrier divisor)
         mod-env   (env-gen (lin-env attack sustain release))
-        amp-env   (env-gen (lin-env attack sustain release) :action FREE)]
-    (pan2 (* gate 0.5 amp-env
+        amp-env   (env-gen (adsr attack decay sustain release level curve) 
+                           :gate gate
+                           :action FREE)]
+    (pan2 (* 0.5 amp-env
                  (sin-osc (+ carrier
                              (* mod-env  (* carrier depth) (sin-osc modulator))))))))
 
