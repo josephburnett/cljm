@@ -13,7 +13,7 @@ CLJM is an Overtone instrument playing framework.
     (play (with-inst sampled-piano 
       (staff [ C4--- D4- E4--- C4- E4-- C4-- E4--- ])))
 
-#### Composition
+#### Manipulation
 
     (def base (staff [ C2-- C3- . G2. +A2-- C3- - ]))
     (def blues-change
@@ -27,7 +27,7 @@ CLJM is an Overtone instrument playing framework.
     
     (play (with-inst sampled-piano blues-change))
 
-#### Familiar formatting
+#### Composition
 
     (def clementine
       
@@ -67,6 +67,39 @@ CLJM is an Overtone instrument playing framework.
     ))
     
     (play (with-inst sampled-piano clementine))
+
+## Fundamentals
+
+#### CLJM Data
+
+1. CLJM is just a collection of Notes
+2. A Note is a beat, an instrument and some parameters
+
+Some functions generate a collection of notes:
+
+* staff 
+* bar
+
+Other functions mutate collections of notes:
+
+* phrase -- put two note collections end-to-end
+* score -- interleave two note collections
+* with -- append/update notes parameters
+* with-inst -- overwrite note instruments
+
+#### Staff Notation
+
+#### Bar Notation
+
+#### 
+
+## CLJM Player
+
+#### Play
+
+#### Channels
+
+#### Filters
 
 ## License
 
