@@ -33,10 +33,6 @@
                  (sin-osc (+ carrier
                              (* env  (* carrier depth) (sin-osc modulator))))))))
 
-;; (inst-fx! fminst fx-chorus)
-;; (inst-fx! fminst fx-echo)
-;; (inst-fx! fminst fx-distortion)
-
 (definst hat-in []
   (pan2 (play-buf 1 (load-sample (freesound-path 109723)))))
 
@@ -55,6 +51,9 @@
 (def baseline (with [:attack 0 :depth 3.0] (with-inst fminst 
   (staff [ A3- A2- A3-   - | - A3- A2--  | A2- A1- C2. . A1. . ]
          [   -   - C2- D2- | -   - - A1- |   - - - -   ]))))
+
+;; (inst-fx! fminst fx-chorus)
+;; (inst-fx! fminst fx-distortion)
 
 ;; (play (l (up 24 baseline)))
 
