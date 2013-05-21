@@ -15,14 +15,17 @@ CLJM is an Overtone instrument playing framework.
 
 #### Composition
 
-    (def melody
+    (def base (staff [ C2-- C3- . G2. +A2-- C3- - ]))
+    (def blues-change
       (phrase
-        (staff [ C4--- D4- | E4---       C4- | E4-- C4-- | E4--- - ])
-        (staff [ D4--- E4- | F4- F4- E4- D4- | F4----    | ----    ])))
-    (def baseline (phrase (repeat 2 (staff [ C2---- | C3---- ]))))
+        (phrase (repeat 2 base))
+        (up 5 base)
+        base
+        (up 7 base)
+        (up 5 base)
+        (phrase (repeat 2 base))))
     
-    (play (with-inst sampled-piano
-      (score melody (phrase baseline (up 2 baseline)))))
+    (play (with-inst sampled-piano blues-change))
 
 #### Familiar formatting
 
