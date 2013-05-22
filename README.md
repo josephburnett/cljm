@@ -124,6 +124,25 @@ Staff notation uses bar notation to actually generate a list of notes.
 
 #### Bar Notation
 
+Bar is the core function which produces a list of notes from a beat-length, instrument, note beats and parameters.
+
+    ; Produces a list of two notes with no instrument and no parameters
+    (bar 4 nil [1 2])
+    ; (#cljm.core.Note{:at 1, :inst nil, :params [], :tparams []} 
+    ;  #cljm.core.Note{:at 2, :inst nil, :params [], :tparams []})
+    
+    ; Two notes with tone
+    (bar 4 nil [1 2] [:note (note :C4) (note :D4)])
+    ; (#cljm.core.Note{:at 1, :inst nil, :params (:note 60), :tparams []} 
+    ;  #cljm.core.Note{:at 2, :inst nil, :params (:note 62), :tparams []})
+    
+    ; And with a duration - same as (staff [ C4-- D4-- ])
+    (bar 4 nil [1 2] [:note (note :C4) (note :D4)] [:at [1 :gate 0]])
+    ; (#cljm.core.Note{:at 1, :inst nil, :params (:note 60), :tparams ([1 :gate 0])} 
+    ;  #cljm.core.Note{:at 2, :inst nil, :params (:note 62), :tparams ([1 :gate 0])})
+
+Bar will produces as many notes as beats and cycle other parameters.  It will also expand non-beat parameters in a list comprehension-like manner, but I don't know if this is really useful.
+
 #### 
 
 ## CLJM Player
