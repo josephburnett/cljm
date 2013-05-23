@@ -124,7 +124,7 @@ Staff notation uses bar notation to actually generate a list of notes.
 
 #### Bar Notation
 
-Bar is the core function which produces a list of notes from a beat-length, instrument, note beats and parameters.
+Bar is the core function which produces a list of notes from a beat-length, instrument, note beats, and parameters.
 
     ; Produces a list of two notes with no instrument and no parameters
     (bar 4 nil [1 2])
@@ -143,15 +143,46 @@ Bar is the core function which produces a list of notes from a beat-length, inst
 
 Bar will produces as many notes as beats and cycle other parameters.  It will also expand non-beat parameters in a list comprehension-like manner, but I don't know if this is really useful.
 
-#### 
-
 ## CLJM Player
 
 #### Play
 
+The play function will play a list of notes according to the common metronome CLJM-METRO.  
+
+    ; If given only a list of notes, play will start with the next beat.
+    (play blues-change)
+    
+    ; If given a beat to start on and a measure length, it will synchrnoize the notes to that beat
+    (play 1 8 blues-change) ; Play on the next 1 of an 8 beat measure
+    
+    ; You can create an infinite list of notes with lazy-loop
+    (play (lazy-loop blues-change))
+
 #### Channels
 
+Every note is played in a channel.  If not specified, notes will play in the :default channel.
+
+    ; You can temporarily mute a channel
+    (mute) ; Mutes the :default channel
+    (mute :piano) ; Mutes the :piano channel
+    
+    ; You can clear all notes playing in a channel
+    (clear)
+    (clear :piano)
+    
+    ; You can play into a channel with a MIDI instrument
+    (play-in) ; Global MIDI events generate notes in the :default channel
+    (play-in :piano)
+
 #### Filters
+
+Filters can be applied to notes playing a channel.
+
+    ; Add an instrument to any notes that don't have one 
+    (add-filter (f-inst sampled-piano))
+    
+    ; Append parameters
+    (add-filter (f-param :vol 0.5) :piano)
 
 ## License
 

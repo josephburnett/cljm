@@ -48,6 +48,20 @@
 (definst low-tone-with-ringmod []
   (pan2 (play-buf 1 (load-sample (freesound-path 38718)))))
 
+(definst snare1 []
+  (pan2 (play-buf 1 (load-sample (freesound-path 131363)))))
+
+(definst snare2 []
+  (pan2 (play-buf 1 (load-sample (freesound-path 13752)))))
+
+(definst hi-hat []
+  (pan2 (play-buf 1 (load-sample (freesound-path 61558)))))
+
+(definst crash []
+  (pan2 (play-buf 1 (load-sample (freesound-path 15576)))))
+
+
+
 (def baseline (with [:attack 0 :depth 3.0] (with-inst fminst 
   (staff [ A3- A2- A3-   - | - A3- A2--  | A2- A1- C2. . A1. . ]
          [   -   - C2- D2- | -   - - A1- |   - - - -   ]))))
