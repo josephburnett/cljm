@@ -13,7 +13,9 @@ CLJM is an Overtone instrument playing framework.
     (play (with-inst sampled-piano 
       (staff [ C4--- D4- E4--- C4- E4-- C4-- E4--- ])))
 
-#### Manipulation
+#### Composition
+
+With functions:
 
     (def base (staff [ C2-- C3- . G2. +A2-- C3- - ]))
     (def blues-change
@@ -27,7 +29,7 @@ CLJM is an Overtone instrument playing framework.
     
     (play (with-inst sampled-piano blues-change))
 
-#### Composition
+Or staff-like notation:
 
     (def clementine
       
@@ -103,12 +105,12 @@ Staff notation provides a compact way to represent tone and rythm.  An initial :
     ; Time attached to a note becomes it's duration.
     (staff [ C4-- D4. ] ; C4 1/4 note and D4 1/16 note
     
-    ; Multiple staff lines become scored together
+    ; Multiple staff lines are scored together
     (staff [ C4-- D4-- ]
            [ E4-- F4-- ])
     
     ; Stop-time (|) separates the time which drives the rhythm forward from that which does not.
-    (staff [ C4--|-- D4-- ]) ; C4 is held for 1/2 beat but displaces the D4 by only 1/4 beat
+    (staff [ C4--|-- D4-- ]) ; C4 is held for 1/2 beat but displaces D4 by only 1/4 beat
     
     ; Stop-time allows you to:
     ; 1. score notes on the same staff line 
@@ -136,12 +138,12 @@ Bar is the core function which produces a list of notes from a beat-length, inst
     ; (#cljm.core.Note{:at 1, :inst nil, :params (:note 60), :tparams []} 
     ;  #cljm.core.Note{:at 2, :inst nil, :params (:note 62), :tparams []})
     
-    ; And with a duration - same as (staff [ C4-- D4-- ])
+    ; Two notes with tone and duration - same as (staff [ C4-- D4-- ])
     (bar 4 nil [1 2] [:note (note :C4) (note :D4)] [:at [1 :gate 0]])
     ; (#cljm.core.Note{:at 1, :inst nil, :params (:note 60), :tparams ([1 :gate 0])} 
     ;  #cljm.core.Note{:at 2, :inst nil, :params (:note 62), :tparams ([1 :gate 0])})
 
-Bar will produces as many notes as beats and cycle other parameters.  It will also expand non-beat parameters in a list comprehension-like manner, but I don't know if this is really useful.
+Bar will produces as many notes as beats and cycle the other parameters.  It will also expand non-beat lists of parameters like a list comprehension.  (I made this so I could produce chords with bar notation, but I don't it's really useful.)
 
 ## CLJM Player
 
@@ -167,8 +169,7 @@ Every note is played in a channel.  If not specified, notes will play in the :de
     (mute :piano) ; Mutes the :piano channel
     
     ; You can clear all notes playing in a channel
-    (clear)
-    (clear :piano)
+    (clear) ; Clears the :default channel
     
     ; You can play into a channel with a MIDI instrument
     (play-in) ; Global MIDI events generate notes in the :default channel
@@ -183,6 +184,14 @@ Filters can be applied to notes playing a channel.
     
     ; Append parameters
     (add-filter (f-param :vol 0.5) :piano)
+
+## References
+
+Other projects:
+
+Leipzip (github.com/ctford/leipzig) -- This one is way more mature and has a lot of music theory built in.
+
+Hummingbird Notation (www.hummingbirdnotation.com) -- This is a brillant new take on musical notation that easier to read and write.
 
 ## License
 
