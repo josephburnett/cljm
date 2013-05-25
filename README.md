@@ -189,7 +189,7 @@ Filters can be applied to notes playing a channel.
 
 Other projects:
 
-Leipzip (github.com/ctford/leipzig) -- This one is way more mature and has a lot of music theory built in.
+Leipzip (www.github.com/ctford/leipzig) -- This one is way more mature and has a lot of music theory built in.
 
 Hummingbird Notation (www.hummingbirdnotation.com) -- This is a brillant new take on musical notation that easier to read and write.
 
