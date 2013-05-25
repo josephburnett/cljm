@@ -187,9 +187,9 @@ Filters can be applied to notes playing a channel.
 
 ## References
 
-Other projects:
+Overtone (http://overtone.github.io/) -- "Overtone is an open source audio environment designed to explore new musical ideas from synthesis and sampling to instrument building, live-coding and collaborative jamming."
 
-Leipzip (www.github.com/ctford/leipzig) -- This one is way more mature and has a lot of music theory built in.
+Leipzip (https://github.com/ctford/leipzig) -- This one is way more mature and has a lot of music theory built in.
 
 Hummingbird Notation (www.hummingbirdnotation.com) -- This is a brillant new take on musical notation that easier to read and write.
 
