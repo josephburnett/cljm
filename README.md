@@ -1,13 +1,13 @@
 # cljm
 
-CLJM is an Overtone instrument playing framework.
+CLJM is an <a href="http://overtone.github.io/">Overtone</a> instrument playing framework.
 
 ## Usage
 
 #### Basic Usage
 
-    (use 'cljm.live)
-    (in-ns 'cljm.live)
+    (use 'cljm.notation)
+    (use 'cljm.player)
     (use 'overtone.inst.sampled-piano)
     
     (play (with-inst sampled-piano 
@@ -99,7 +99,7 @@ Staff notation provides a compact way to represent tone and rythm.  An initial :
     ; Sharps and flats
     (staff [ +C4 oD4 ])
     
-    ; Time is given as a sum of 1/8 (-), 1/16 (.), 1/32 (_), and 1/64 (*)
+    ; Time is given as a sum of 1/8 (-), 1/16 (.), 1/32 (_), and 1/64 (*) notes
     (staff [ ---- ]) ; 1/2 beat rest
     
     ; Time attached to a note becomes it's duration.
@@ -143,7 +143,9 @@ Bar is the core function which produces a list of notes from a beat-length, inst
     ; (#cljm.core.Note{:at 1, :inst nil, :params (:note 60), :tparams ([1 :gate 0])} 
     ;  #cljm.core.Note{:at 2, :inst nil, :params (:note 62), :tparams ([1 :gate 0])})
 
-Bar will produces as many notes as beats and cycle the other parameters.  It will also expand non-beat lists of parameters like a list comprehension.  (I made this so I could produce chords with bar notation, but I don't it's really useful.)
+Bar will produce as many notes as there are beats given and cycle the other parameters.  It will also expand non-beat lists of parameters like a list comprehension.  (I made this so I could produce chords with bar notation, but I don't it's very useful.)
+
+Parameter lists that start with :at are temporal parameters.  The first element is the relative beat at which the parameters should be applied to the note via the Overtone ctl function.
 
 ## CLJM Player
 
@@ -182,8 +184,8 @@ Filters can be applied to notes playing a channel.
     ; Add an instrument to any notes that don't have one 
     (add-filter (f-inst sampled-piano))
     
-    ; Append parameters
-    (add-filter (f-param :vol 0.5) :piano)
+    ; Append/update parameters
+    (add-filter (f-param :vol 0.5))
 
 ## References
 
