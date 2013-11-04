@@ -1,4 +1,7 @@
-(defproject cljm "1.0.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :dependencies [[org.clojure/clojure "1.3.0"],
+(defproject cljm "0.1.0-SNAPSHOT"
+  :description "CLJM is an Overtone instrument playing framework."
+  :url "https://github.com/josephburnett/cljm"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :dependencies [[org.clojure/clojure "1.5.1"]
                  [overtone "0.8.1"]])

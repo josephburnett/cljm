@@ -40,5 +40,6 @@
 (use 'overtone.live)
 (use 'overtone.inst.sampled-piano) ; Warning, downloads 200M of samples!
 (use 'cljm.player)
-(play-with sampled-piano clementine)
+(use 'cljm.core)
+(play (with-inst sampled-piano clementine))
 )
