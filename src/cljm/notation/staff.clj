@@ -1,4 +1,4 @@
-(ns cljm.notation
+(ns cljm.notation.staff
   (:use cljm.core)
   (:use overtone.core))
 

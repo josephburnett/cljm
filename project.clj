@@ -3,5 +3,6 @@
   :url "https://github.com/josephburnett/cljm"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [overtone "0.8.1"]])
+  :dependencies [[org.clojure/clojure "[1.4,)"]
+                 [overtone "0.8.1"]
+                 [clearley "0.3.0"]])

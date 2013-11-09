@@ -3,6 +3,7 @@
 
 (defrecord Note [at inst params tparams])
 (defrecord Time [at bpm])
+(defrecord Event [params inc-time inc-length])
 
 (defn note? [o] (= cljm.core.Note (type o)))
 (defn time? [o] (= cljm.core.Time (type o))) 
