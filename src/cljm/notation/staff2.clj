@@ -1,5 +1,5 @@
 (ns cljm.notation.staff2
-  (:require [cljm.core :refer [bar]]
+  (:require [cljm.core :refer [bar phrase score]]
             [clearley.core :refer [build-parser execute]]
             [clearley.match :refer [defmatch]]
             [clearley.lib :refer :all]
@@ -31,6 +31,10 @@
   ([\_] 1/8)
   ([\*] 1/16))
 
+(defmatch whitespace
+  (['(:or \space \tab \newline \return)])
+  ([whitespace '(:star whitespace)]))
+
 (defn one-note-seq
   [n t-in t-out]
   (bar t-in nil [1] [:note n] [:at [(+ t-in t-out) :gate 0]]))
@@ -43,6 +47,25 @@
   ([(n note) (t-in '(:star time-inc))]
     (one-note-seq n (reduce + t-in) 0))
   ([(n note) (t-in '(:star time-inc)) \| (t-out '(:star time-inc))]
-    (one-note-seq n (reduce + t-in) (reduce + t-out))))
+    (one-note-seq n (reduce + t-in) (reduce + t-out)))
+  ([time-stop]
+    (zero-note-seq 0))
+  ([(r '(:star time-inc))]
+    (zero-note-seq (reduce + r))))
 
-(def my-notation (build-parser term))
+(defmatch term-seq
+  ([(t term)] t)
+  ([(t1 term) whitespace (t2 term-seq)]
+    (phrase t1 t2)))
+
+(def staff-parser (build-parser term-seq))
+
+(defmacro line-bars 
+  ([term] `(list (execute staff-parser (str (quote ~term)))))
+  ([term & terms]
+    `(cons (execute staff-parser (str (quote ~term))) (line-bars ~@terms))))
+
+(defmacro staff
+  ([line] `(phrase (line-bars ~@line)))
+  ([line & lines]
+    `(score (phrase (line-bars ~@line)) (staff ~@lines))))
