@@ -60,12 +60,26 @@
 
 (def staff-parser (build-parser term-seq))
 
+(defn parse [term-seq-string]
+  (try
+    (execute staff-parser term-seq-string)
+    (catch Exception e 
+      ; Clearley's exception messages are very unhelpful!
+      (throw (Exception. (str "Unable to parse: " term-seq-string " "
+                              "Reason: " (.getMessage e)))))))
+
 (defmacro line-bars 
-  ([term] `(list (execute staff-parser (str (quote ~term)))))
+  ([term] 
+    `(list (parse (str (quote ~term)))))
   ([term & terms]
-    `(cons (execute staff-parser (str (quote ~term))) (line-bars ~@terms))))
+    `(cons (parse (str (quote ~term))) (line-bars ~@terms))))
 
 (defmacro staff
-  ([line] `(phrase (line-bars ~@line)))
-  ([line & lines]
-    `(score (phrase (line-bars ~@line)) (staff ~@lines))))
+  ([line] 
+    (if (string? line)
+      `(phrase (line-bars ~line))
+      `(phrase (line-bars ~@line))))
+  ([line & lines] 
+    (if (string? line)
+      `(score (phrase (line-bars ~line)) (staff ~@lines))
+      `(score (phrase (line-bars ~@line)) (staff ~@lines)))))
