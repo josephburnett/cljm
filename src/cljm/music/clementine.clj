@@ -1,5 +1,5 @@
 (ns cljm.music.clementine
-  (:use cljm.notation.staff))
+  (:use cljm.notation.staff2))
 
 (def clementine
 

@@ -8,6 +8,14 @@
 (defn note? [o] (= cljm.core.Note (type o)))
 (defn time? [o] (= cljm.core.Time (type o))) 
 
+(defn is-note-coll? [c]
+  (and (coll? c)
+       (not (nil? (:beat-length (meta c))))
+       (every? note? c)))
+
+(defn every-note-coll? [colls]
+  (if (every? is-note-coll? colls) true false))
+
 (defn panic 
   [& msg] 
   (let [m (map #(if (nil? %1) "nil" %1) msg)]
@@ -16,16 +24,16 @@
 (defn- merge-bars
   ([a b] (reverse (merge-bars a b '())))
   ([a b c]
-   (cond
-     ; done
-     (and (empty? a) (empty? b)) c
-     (empty? a) (concat (reverse b) c)
-     (empty? b) (concat (reverse a) c)
-     ; smallest goes first
-     (< (:at (first a)) (:at (first b)))
-       (merge-bars (rest a) b (cons (first a) c))
-     :else
-       (merge-bars a (rest b) (cons (first b) c)))))
+    (cond
+      ; done
+      (and (empty? a) (empty? b)) c
+      (empty? a) (concat (reverse b) c)
+      (empty? b) (concat (reverse a) c)
+      ; smallest goes first
+      (< (:at (first a)) (:at (first b)))
+        (merge-bars (rest a) b (cons (first a) c))
+      :else
+        (merge-bars a (rest b) (cons (first b) c)))))
 
 (defn- expand 
   [notes]
@@ -95,28 +103,39 @@
         (cons next-val (running-index next-val (rest coll)))))))
 
 (defn phrase
-  ([b & bars] (phrase (cons b bars)))
-  ([bars]
-    (if (or (nil? (meta bars)) (nil? (:beat-length (meta bars))))
-      ;; bars is a collection of phrases
-      (let [beats (map #(:beat-length (meta %)) bars)]
+  [b & bars]
+  (if (and ; single non-note collection parameter?
+           (empty? bars)
+           (not (is-note-coll? b))
+           (coll? b))
+    (apply phrase b) ; treat as a list of note collections
+                      ; i.e. (repeat 10 (bar..))
+    (do
+      (assert (every-note-coll? (cons b bars)) "invalid phrase")
+      (let [beats (map #(:beat-length (meta %)) (cons b bars))]
         (with-meta
           (flatten
-            (map (fn [b i]
+            (map (fn [b index]
                    (let [beat-length (:beat-length (meta b))]
-                     (map #(assoc % :at (+ i (:at %))) b)))
-                 bars
+                     (map #(assoc % :at (+ index (:at %))) b)))
+                 (cons b bars)
                  (running-index beats)))
-          {:beat-length (reduce + beats)}))
-      ;; bars is already a single phrase
-      bars)))
+          {:beat-length (reduce + beats)})))))
 
 (defn score
-  ([b & bars] (score (cons b bars)))
-  ([bars]
-    (with-meta
-      (reduce merge-bars '() bars)
-      {:beat-length (reduce max (map #(:beat-length (meta %)) bars))})))
+  [b & bars]
+  (if (and ; single non-note collection parameter?
+           (empty? bars) 
+           (not (is-note-coll? b))
+           (coll? b))
+    (apply score b) ; treat as a list of note collections
+                    ; i.e. (repeat 10 (bar..))
+    (do
+      (assert (every-note-coll? (cons b bars)) "invalid score")
+      (let [beats (map #(:beat-length (meta %)) (cons b bars))]
+        (with-meta
+          (reduce merge-bars b bars)
+          {:beat-length (reduce max beats)})))))
 
 (defn at-bpm
   [bpm bars]
@@ -128,5 +147,4 @@
 
 (defn tparam [p & times]
   (cons :at (map #(cons %1 p) times)))
-
 

@@ -5,6 +5,8 @@
             [clearley.lib :refer :all]
             [overtone.core]))
 
+(def sheet phrase)
+
 (defmatch note
   ([(k note-key) (o note-octave)]
     (overtone.core/note (str k o)))
