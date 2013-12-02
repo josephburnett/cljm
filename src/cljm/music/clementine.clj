@@ -1,39 +1,37 @@
 (ns cljm.music.clementine
-  (:use cljm.notation.staff2))
+  (:use cljm.notation.staff))
 
 (def clementine
 
-  (sheet
+  (staff [" -- -- C4- C4-     | C4-- G3-- E4- E4- | E4-- C4-- C4- E4- "
+          " -- -- --          | --   --   --      | --   --   --      "
+          " -- -- --          | --   --   --      | --   --   --      "]
+          ;       in  a         ca-  vern in  a     can- yon  ex- ca-
 
-    (staff [ -- -- C4- C4-     | C4-- G3-- E4- E4- | E4-- C4-- C4- E4- ]
-           [ -- -- --          | --   --   --      | --   --   --      ]
-           [ -- -- --          | --   --   --      | --   --   --      ])
-           ;       in  a         ca-  vern in  a     can- yon  ex- ca-
+         [" G4-- G4-- F4- E4- | D4-- -- D4- E4-   | F4-- F4-- E4- D4- "
+          " G3----    --      | G3----  --        | G3----    --      "
+          " E3----    --      | F3----  --        | F3----    --      "]
+          ; va-  ting for a     mine    dwelt a     min- er   for-ty
 
-    (staff [ G4-- G4-- F4- E4- | D4-- -- D4- E4-   | F4-- F4-- E4- D4- ]
-           [ G3----    --      | G3----  --        | G3----    --      ]
-           [ E3----    --      | F3----  --        | F3----    --      ])
-           ; va-  ting for a     mine    dwelt a     min- er   for-ty
+         [" E4-- C4-- C4- E4- | D4-- -- B3- D4-   | C4---- C4- C4-    "
+          " G3----    --      | --   G3-- --      | G3---- --         "
+          " E3----    --      | --   F3-- --      | E3---- --         "]
+          ; nin- er   and his   daugh-ter Clem-en-  tine   oh  my
 
-    (staff [ E4-- C4-- C4- E4- | D4-- -- B3- D4-   | C4---- C4- C4-    ]
-           [ G3----    --      | --   G3-- --      | G3---- --         ]
-           [ E3----    --      | --   F3-- --      | E3---- --         ])
-           ; nin- er   and his   daugh-ter Clem-en-  tine   oh  my
+         [" C4-- G3-- E4- E4- | E4-- C4-- C4- E4- | G4-- G4-- F4- E4- "
+          " --   --   --      | --   --   --      | G3----    --      "
+          " --   --   --      | --   --   --      | E3----    --      "]
+         ; dar- ling oh  my    dar- ling oh  my    dar- ling Clem-en-
 
-    (staff [ C4-- G3-- E4- E4- | E4-- C4-- C4- E4- | G4-- G4-- F4- E4- ]
-           [ --   --   --      | --   --   --      | G3----    --      ]
-           [ --   --   --      | --   --   --      | E3----    --      ])
-           ; dar- ling oh  my    dar- ling oh  my    dar- ling Clem-en-
+         [" D4-- -- D4- E4-   | F4-- F4-- E4- D4- | E4-- C4-- C4- E4- "
+          " G3---- --         | G3---- --         | G3---- --         "
+          " F3---- --         | F3---- --         | E3---- --         "]
+          ; tine    you are     lost and  gone for- ev-  er   dread-ful 
 
-    (staff [ D4-- -- D4- E4-   | F4-- F4-- E4- D4- | E4-- C4-- C4- E4- ]
-           [ G3---- --         | G3---- --         | G3---- --         ]
-           [ F3---- --         | F3---- --         | E3---- --         ])
-           ; tine    you are     lost and  gone for- ev-  er   dread-ful 
-
-    (staff [ D4-- -- B3- D4-   | C4------ ]
-           [ --   G3-- --      | G3------ ]
-           [ --   F3-- --      | E3------ ])
-           ; sor  ry Clem-en-    tine
+         [" D4-- -- B3- D4-   | C4------ "
+          " --   G3-- --      | G3------ "
+          " --   F3-- --      | E3------ "]
+         ; sor  ry Clem-en-    tine
 ))
 
 (comment

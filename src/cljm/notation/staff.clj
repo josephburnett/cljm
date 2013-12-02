@@ -1,69 +1,72 @@
 (ns cljm.notation.staff
-  (:use cljm.core)
-  (:use overtone.core))
+  (:require [cljm.core :refer [bar phrase score]]
+            [cljm.notation.core :refer [def-phrase-notation]]
+            [clearley.core :refer [build-parser execute]]
+            [clearley.match :refer [defmatch]]
+            [clearley.lib :refer :all]
+            [overtone.core]))
 
-(def sheet phrase)
+(defmatch staffnote
+  ([(k note-key) (o note-octave)]
+    (overtone.core/note (str k o)))
+  ([(k note-key) (o note-octave) (m note-modifier)]
+    (+ m (overtone.core/note (str k o)))))
+  
+(defmatch note-key
+  [(k '(:or \A \B \C \D \E \F \G))] 
+  k)
 
-(defn- sum-time [t]
-  (reduce #(+ %1 (case %2
-                  \- 1/2
-                  \. 1/4
-                  \_ 1/8
-                  \* 1/16))
-           0.0 (filter #(contains? #{ \- \. \_ } %1) t)))
+(defmatch note-octave
+  [(o '(:or \1 \2 \3 \4 \5 \6 \7 \8))]
+  o)
 
-(defn- count-time-in [term]
-  (let [t (take-while #(not (= \| %1)) term)]
-    (sum-time t)))
+(defmatch note-modifier
+  ([\+] 1)
+  ([\o] -1))
 
-(defn- count-time-total [term]
-  (sum-time term))
+(defmatch time-stop [\|])
 
-(defn- term-accidental [term]
-  (reduce #(+ %1 (case %2
-                   \o -1
-                   \+ 1))
-           0 (filter #(contains? #{ \o \+ } %1) term)))
+(defmatch time-inc
+  ([\-] 1/2)
+  ([\.] 1/4)
+  ([\_] 1/8)
+  ([\*] 1/16))
 
-(defn- term-note [term]
-  (let [n #{ \A \B \C \D \E \F \G
-             \1 \2 \3 \4 \5 \6 \7 \8 \9 \0}
-        t (filter #(contains? n %1) term)]
-    (if (empty? t)
-      nil ; rest
-      (+ (note (keyword (apply str t)))
-         (term-accidental term)))))
+(defmatch whitespace
+  (['(:or \space \tab \newline \return)])
+  ([whitespace '(:star whitespace)]))
 
-(defn- beat-only? [term]
-  (if (empty? (filter #(= \O %1) term)) false true))
+(defn one-note-seq
+  [n t-in t-out]
+  (bar t-in nil [1] [:note n] [:at [(+ t-in t-out) :gate 0]]))
 
-(defn- duration-only? [term]
-  (if (empty? (filter #(= \X %1) term)) false true))
+(defn zero-note-seq
+  [t] 
+  (bar t nil []))
 
-(defn term-bar [term]
-  (let [t (count-time-in term)]
-    (if (beat-only? term)
-      ;; Term is only a beat
-      (bar t nil [1])
-      (if (duration-only? term)
-        ;; Term is beat and duration, but no tone
-        (bar t nil [1] [:at [(count-time-total term) :gate 0]]) 
-        (let [n (term-note term)]
-          (if (nil? n)
-            ;; Rest
-            (bar (count-time-in term) nil []) ; rest
-            ;; Tone and duration
-            (bar (count-time-in term) nil [1] [:note n]
-                 [:at [(count-time-total term) :gate 0]])))))))
-       
-(defmacro line-bars 
-  "Interpret terms as string parameters to term-bar."
-  ([term] `(list (term-bar (str (quote ~term)))))
-  ([term & terms]
-    `(cons (term-bar (str (quote ~term))) (line-bars ~@terms))))
+(defmatch term
+  ([(n staffnote) (t-in '(:star time-inc))]
+    (one-note-seq n (reduce + t-in) 0))
+  ([(n staffnote) (t-in '(:star time-inc)) \| (t-out '(:star time-inc))]
+    (one-note-seq n (reduce + t-in) (reduce + t-out)))
+  ([time-stop]
+    (zero-note-seq 0))
+  ([(r '(:star time-inc))]
+    (zero-note-seq (reduce + r))))
 
-(defmacro staff
-  ([line] `(phrase (line-bars ~@line)))
-  ([line & lines]
-    `(score (phrase (line-bars ~@line)) (staff ~@lines))))
+(defmatch term-seq
+  ([(t term)] t)
+  ([(t1 term) whitespace (t2 term-seq)]
+    (phrase t1 t2)))
 
+(def staff-parser (build-parser term-seq))
+
+(defn parse [term-seq-string]
+  (try
+    (execute staff-parser term-seq-string)
+    (catch Exception e 
+      ; Clearley's exception messages are very unhelpful!
+      (throw (Exception. (str "Unable to parse: " term-seq-string " "
+                              "Reason: " (.getMessage e)))))))
+
+(def-phrase-notation staff parse)

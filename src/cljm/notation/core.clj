@@ -6,7 +6,6 @@
 
 (defn read-phrase
   [string-bar-fn & notes]
-  (println notes)
   (phrase (map #(if (coll? %)
                   (apply read-score string-bar-fn %)
                   (string-bar-fn %))
@@ -14,14 +13,19 @@
 
 (defn read-score
   [string-bar-fn & notes]
-  (println notes)
   (score (map #(if (coll? %)
                  (apply read-phrase string-bar-fn %)
                  (string-bar-fn %))
               notes)))
 
-(defmacro defphrasenotation
+(defmacro def-phrase-notation
   [notation-name string-bar-fn]
   `(defn ~notation-name
      [& notes#]
      (apply read-phrase (cons ~string-bar-fn notes#))))
+
+(defmacro def-score-notation
+  [notation-name string-bar-fn]
+  `(defn ~notation-name
+     [& notes#]
+     (apply read-score (cons ~string-bar-fn notes#))))
