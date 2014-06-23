@@ -5,8 +5,8 @@
 (defrecord Time [at bpm])
 (defrecord Event [params inc-time inc-length])
 
-(defn note? [o] (= cljm.core.Note (type o)))
-(defn time? [o] (= cljm.core.Time (type o))) 
+(defn note? [o] (= "cljm.core.Note" (-> o type .getName)))
+(defn time? [o] (= "cljm.core.Time" (-> o type .getName))) 
 
 (defn is-note-coll? [c]
   (and (coll? c)
@@ -147,4 +147,3 @@
 
 (defn tparam [p & times]
   (cons :at (map #(cons %1 p) times)))
-
