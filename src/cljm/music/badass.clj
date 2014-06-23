@@ -13,3 +13,13 @@
       (pan2 (~'* 0.5 ~'env
                    (sin-osc (~'+ ~'carrier
                                (~'* ~'env  (~'* ~'carrier ~'depth) (sin-osc ~'modulator)))))))))
+
+(deffminst i1)
+(inst-fx! i1 fx-chorus)
+(inst-fx! i1 fx-distortion)
+
+(deffminst i2)
+
+(def mainhook (with [:attack 0 :depth 3.0] (with-inst fminst 
+  (staff [ "A5- A4- A5-   - | - A5- A4--  | A4- A3- C4. . A3. ."
+           "  -   - C4- D4- | -   - - A3- |   - - - - "  ]))))

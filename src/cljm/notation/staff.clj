@@ -4,7 +4,7 @@
             [clearley.core :refer [build-parser execute]]
             [clearley.match :refer [defmatch]]
             [clearley.lib :refer :all]
-            [overtone.core]))
+            [overtone.core :refer [midi->hz]]))
 
 (defmatch staffnote
   ([(k note-key) (o note-octave)]
@@ -38,7 +38,7 @@
 
 (defn one-note-seq
   [n t-in t-out]
-  (bar t-in nil [1] [:note n] [:at [(+ t-in t-out) :gate 0]]))
+  (bar t-in nil [1] [:note n] [:freq (midi->hz n)] [:at [(+ t-in t-out) :gate 0]]))
 
 (defn zero-note-seq
   [t] 
